@@ -1,18 +1,23 @@
 package pers.crazymouse.algorithm.visualizer;
 
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 /**
  * Created by crazymouse on 6/19/16.
  */
+
+/**
+ * The {@code Square} class defines a square
+ * with the specified size and location.
+ */
 public class Square extends Rectangle {
     /**
      * Creates an empty instance of Square.
      */
     public Square() {
-        widthProperty().addListener(observable -> setHeight(widthProperty().getValue()));
-        heightProperty().addListener(observable -> setWidth(heightProperty().getValue()));
+        this(0);
     }
 
     /**
@@ -21,8 +26,16 @@ public class Square extends Rectangle {
      * @param length length of the square
      */
     public Square(double length) {
-        this();
-        setWidth(length);
+        this(length, Color.BLACK);
+    }
+
+    /**
+     * Creates a new instance of Square with the given size.
+     *
+     * @param color length of the square
+     */
+    public Square(Paint color) {
+        this(0, color);
     }
 
     /**
@@ -32,7 +45,9 @@ public class Square extends Rectangle {
      * @param fill   determines how to fill the interior of the square
      */
     public Square(double length, Paint fill) {
-        this(length);
+        widthProperty().addListener(observable -> setHeight(widthProperty().getValue()));
+        heightProperty().addListener(observable -> setWidth(heightProperty().getValue()));
+        setLength(length);
         setFill(fill);
     }
 
