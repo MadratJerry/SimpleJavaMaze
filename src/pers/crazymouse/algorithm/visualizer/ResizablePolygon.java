@@ -6,7 +6,7 @@ import javafx.scene.shape.Polygon;
 /**
  * Created by crazymouse on 6/21/16.
  */
-public class ResizablePolygon extends Polygon {
+public class ResizablePolygon extends Polygon implements Resizable {
     private double currentWidth;
     private double currentHeight;
 
