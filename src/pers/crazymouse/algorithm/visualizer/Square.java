@@ -12,7 +12,7 @@ import javafx.scene.shape.Rectangle;
  * The {@code Square} class defines a square
  * with the specified size and location.
  */
-public class Square extends Rectangle {
+public class Square extends Rectangle implements Resizable {
     /**
      * Creates an empty instance of Square.
      */
@@ -64,7 +64,27 @@ public class Square extends Rectangle {
         setY(y);
     }
 
+    @Override
+    public void resize(double width, double height) {
+        if (width == 0 || height == 0) return;
+        resizeWithRate(width > height ? width : height / getLength());
+    }
+
+    @Override
+    public void resizeWithRate(double rate) {
+        setLength(getLength() * rate);
+    }
+
+    @Override
+    public boolean isResizable() {
+        return true;
+    }
+
     public final void setLength(double length) {
         setWidth(length);
+    }
+
+    public double getLength() {
+        return getWidth();
     }
 }

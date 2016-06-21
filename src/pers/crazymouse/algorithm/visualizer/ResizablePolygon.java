@@ -16,7 +16,6 @@ public class ResizablePolygon extends Polygon implements Resizable {
     @Override
     public void resize(double width, double height) {
         computeSize();
-        System.out.println(width + " " + height);
         if (width == 0 || height == 0) return;
         resizeWithRate(width / currentWidth, height / currentHeight);
     }
