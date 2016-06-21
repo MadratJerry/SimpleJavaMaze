@@ -18,9 +18,14 @@ public class ResizablePolygon extends Polygon {
         computeSize();
         System.out.println(width + " " + height);
         if (width == 0 || height == 0) return;
-        double zoomWidthRate = width / currentWidth;
-        double zoomHeightRate = height / currentHeight;
-        System.out.println(zoomWidthRate + " " + zoomHeightRate);
+        resizeWithRate(width / currentWidth, height / currentHeight);
+    }
+
+    public void resizeWithRate(double rate) {
+        resizeWithRate(rate, rate);
+    }
+
+    public void resizeWithRate(double zoomWidthRate, double zoomHeightRate) {
         for (int i = 0; i < getPoints().size(); i += 2) {
             double w = getPoints().get(i);
             double h = getPoints().get(i + 1);
