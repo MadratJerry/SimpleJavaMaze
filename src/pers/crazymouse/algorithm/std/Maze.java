@@ -1,6 +1,9 @@
 package pers.crazymouse.algorithm.std;
 
+import com.sun.javafx.collections.TrackableObservableList;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 
 import java.util.Stack;
 
@@ -16,7 +19,15 @@ public class Maze {
     private Mouse begin;
     private Mouse end;
     private Stack<Mouse> stack = new Stack<>();
-    private Stack<Stack<Integer>> turnStack = new Stack<>(); //TODO record path
+    private Stack<Integer> turnStack = new Stack<>();
+    private int bestPathLength = Integer.MAX_VALUE;
+    private ObservableList<Stack<Integer>> pathList = new TrackableObservableList<Stack<Integer>>() {
+        @Override
+        protected void onChanged(ListChangeListener.Change<Stack<Integer>> c) {
+            if (turnStack.size() < bestPathLength)
+                bestPathLength = turnStack.size();
+        }
+    };
 
     /**
      * Initialize the size of maze.
@@ -109,17 +120,40 @@ public class Maze {
             map[p.x][p.y].setValue(OCC);
             if (p.equals(end)) {
                 p.turn.clear();
+                pathList.add((Stack<Integer>) turnStack.clone());
             }
             if (!p.hasChoice()) {
                 map[p.x][p.y].setValue(BLANK);
                 stack.pop();
+                if (!turnStack.empty())
+                    turnStack.pop();
             } else {
                 Mouse np = p.Turn();
-                if (getValue(np) == BLANK)
+                if (getValue(np) == BLANK) {
                     stack.add(np);
+                } else {
+                    turnStack.pop();
+                }
             }
         }
         return !stack.empty();
+    }
+
+
+    // test function
+    private void showPath() {
+        for (Stack<Integer> turnStack : pathList) {
+            int x = begin.x;
+            int y = begin.y;
+            for (int i : turnStack) {
+                int t = i;
+                t = (t + 2) % 4;
+                x = x + (t - 1) % 2;
+                y = y + (t - 2) % 2;
+                System.out.printf("(%d, %d) ", x, y);
+            }
+            System.out.println();
+        }
     }
 
     class Mouse implements Comparable<Mouse> {
@@ -176,6 +210,7 @@ public class Maze {
                  */
                 e.x = x + (turn.peek() - 1) % 2;
                 e.y = y + (turn.peek() - 2) % 2;
+                turnStack.add((turn.peek() + 2) % 4);
                 e.turn.remove((turn.pop() + 2) % 4);
             } else {
                 e = null;
