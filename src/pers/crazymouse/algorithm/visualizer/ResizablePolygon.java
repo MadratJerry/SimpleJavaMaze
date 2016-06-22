@@ -32,6 +32,10 @@ public class ResizablePolygon extends Polygon implements Resizable {
         });
     }
 
+    public void resize() {
+        resize(resizableWidth.getValue(), resizableHeight.getValue());
+    }
+
     @Override
     public void resize(double width, double height) {
         computeSize();

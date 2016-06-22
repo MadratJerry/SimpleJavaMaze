@@ -12,8 +12,8 @@ import pers.crazymouse.algorithm.std.Maze;
 public class MazePane extends StackPane {
     static final Paint WALL = Color.BLACK;
     static final Paint BLANK = Color.WHITE;
-    static final Paint OCC = Color.GRAY;
-    SGridPane mainPane = new SGridPane(5);
+    static final Paint OCC = Color.ORANGE;
+    SGridPane mainPane = new SGridPane(20);
     SimpleIntegerProperty map[][];
     Maze maze;
 
@@ -36,8 +36,8 @@ public class MazePane extends StackPane {
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
                 MazeElement element = new MazeElement(map[i][j].getValue());
-                mainPane.add(element, i, j);
                 element.typeProperty().bind(map[i][j]);
+                mainPane.add(element, i, j);
             }
         }
     }
