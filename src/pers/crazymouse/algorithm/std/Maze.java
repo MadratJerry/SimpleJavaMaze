@@ -18,8 +18,17 @@ public class Maze {
     private Stack<Mouse> stack = new Stack<>();
     private Stack<Stack<Integer>> turnStack = new Stack<>(); //TODO record path
 
+    /**
+     * Initialize the size of maze.
+     * Initialize the begin and end Mouse for (0, 0)
+     *
+     * @param width  set width of maze
+     * @param height set height of maze
+     */
     public Maze(int width, int height) {
         map = new SimpleIntegerProperty[width][height];
+        begin = new Mouse(0, 0);
+        end = new Mouse(0, 0);
     }
 
     public void setMap(int[][] map) {
@@ -42,6 +51,10 @@ public class Maze {
         searchPath(new Mouse(beginX, beginY), new Mouse(endX, endY));
     }
 
+    public void searchPath() {
+        searchPath(begin, end);
+    }
+
     public int getValue(int x, int y) {
         try {
             return map[x][y].getValue();
@@ -58,21 +71,8 @@ public class Maze {
 
     private void searchPath(Mouse begin, Mouse end) {
         setBegin(begin);
-        while (!stack.empty()) {
-            Mouse p = stack.peek();
-            map[p.x][p.y].setValue(OCC);
-            if (p.equals(end)) {
-                p.turn.clear();
-            }
-            if (!p.hasChoice()) {
-                map[p.x][p.y].setValue(BLANK);
-                stack.pop();
-            } else {
-                Mouse np = p.Turn();
-                if (getValue(np) == BLANK)
-                    stack.add(np);
-            }
-        }
+        setEnd(end);
+        while (singleStep()) ;
     }
 
     public void setBegin(Mouse begin) {
