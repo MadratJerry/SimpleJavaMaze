@@ -23,22 +23,22 @@ public class maze extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-
         HBox pane = new HBox(10);
         pane.setAlignment(Pos.CENTER);
         MazePane mazePane = new MazePane(10, 10);
         mazePane.setMap(new int[][]{
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
-                {0, 0, 1, 1, 1, 0, 0, 1, 1, 1},
-                {0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+                {0, 1, 0, 1, 1, 1, 0, 1, 0, 1},
+                {0, 1, 0, 1, 1, 0, 0, 1, 1, 1},
+                {0, 0, 0, 1, 0, 0, 1, 0, 0, 0},
+                {1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
                 {0, 0, 1, 1, 1, 0, 0, 1, 1, 1},
                 {0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}});
-        mazePane.init(0, 0, 9, 9);
+        mazePane.setBegin(0, 0);
+        mazePane.setEnd(3, 2);
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
@@ -49,8 +49,8 @@ public class maze extends Application {
         Button btRun = new Button("Run!");
         Button btStep = new Button("One step");
         btFile.setOnAction(event -> fileChooser.showOpenDialog(primaryStage));
+        btStep.setOnAction(event -> mazePane.singleStep());
         btRun.setOnAction(event -> mazePane.search());
-//        btRun.setOnAction(event -> mazePane.getMap()[0][0].setValue(MazeElement.OCC));
         btPane.getChildren().addAll(btFile, btRun, btStep);
 
         pane.getChildren().addAll(mazePane, btPane);

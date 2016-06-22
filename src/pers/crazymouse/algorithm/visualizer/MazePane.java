@@ -42,6 +42,23 @@ public class MazePane extends StackPane {
         }
     }
 
+    public void setBegin(int x, int y) {
+        maze.setBegin(x, y);
+    }
+
+    public void setEnd(int x, int y) {
+        maze.setEnd(x, y);
+    }
+
+    public boolean singleStep() {
+        return maze.singleStep();
+    }
+
+    public void search() {
+        maze.searchPath();
+        // TODO display animation
+    }
+
     private Paint getColor(int x) {
         if (x == Maze.WALL)
             return WALL;
