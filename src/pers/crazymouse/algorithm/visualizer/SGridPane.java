@@ -5,6 +5,7 @@ import javafx.beans.Observable;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Shape;
 
 /**
  * Created by crazymouse on 6/19/16.
@@ -48,10 +49,11 @@ public class SGridPane extends GridPane {
         getChildren().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
-                if (!(getChildren().get(getChildren().size() - 1) instanceof Square)) {
+                if (!(getChildren().get(getChildren().size() - 1) instanceof Resizable)) {
                     getChildren().set(getChildren().size() - 1, new Square(getLength(), fill));
                 } else {
-                    ((Square) getChildren().get(getChildren().size() - 1)).setLength(getLength());
+                    getChildren().get(getChildren().size() - 1).resize(getLength(), getLength());
+                    ((Shape) getChildren().get(getChildren().size() - 1)).setFill(getFill());
                 }
             }
         });
