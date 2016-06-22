@@ -11,21 +11,28 @@ import java.util.Stack;
  * Created by crazymouse on 6/21/16.
  */
 public class Maze {
-    public static final int WALL = 1;
-    public static final int BLANK = 0;
+    public static final int BLANK = 1;
+    public static final int WALL = BLANK + 1;
     public static final int OCC = -1;
+    public static final int DIREC = -2;
 
+    private int lastTurn;
     private SimpleIntegerProperty map[][];
     private Mouse begin;
     private Mouse end;
     private Stack<Mouse> stack = new Stack<>();
-    private Stack<Integer> turnStack = new Stack<>();
+    private ObservableList<Integer> turnList = new TrackableObservableList<Integer>() {
+        @Override
+        protected void onChanged(ListChangeListener.Change<Integer> c) {
+
+        }
+    };
     private int bestPathLength = Integer.MAX_VALUE;
     private ObservableList<Stack<Integer>> pathList = new TrackableObservableList<Stack<Integer>>() {
         @Override
         protected void onChanged(ListChangeListener.Change<Stack<Integer>> c) {
-            if (turnStack.size() < bestPathLength)
-                bestPathLength = turnStack.size();
+            if (turnList.size() < bestPathLength)
+                bestPathLength = turnList.size();
         }
     };
 
@@ -45,7 +52,7 @@ public class Maze {
     public void setMap(int[][] map) {
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
-                this.map[i][j] = new SimpleIntegerProperty(map[i][j]);
+                this.map[i][j] = new SimpleIntegerProperty(map[i][j] + Maze.BLANK - 0);
             }
         }
     }
@@ -114,25 +121,43 @@ public class Maze {
         stack.add(begin);
     }
 
+    public ObservableList<Stack<Integer>> getPathList() {
+        return pathList;
+    }
+
+    public ObservableList<Integer> getTurnList() {
+        return turnList;
+    }
+
+    public int getX() {
+        return stack.peek().x;
+    }
+
+    public int getY() {
+        return stack.peek().y;
+    }
+
     public boolean singleStep() {
         if (!stack.empty()) {
             Mouse p = stack.peek();
             map[p.x][p.y].setValue(OCC);
             if (p.equals(end)) {
                 p.turn.clear();
+                Stack<Integer> turnStack = new Stack<>();
+                for (int i : turnList)
+                    turnStack.add(i);
                 pathList.add((Stack<Integer>) turnStack.clone());
             }
             if (!p.hasChoice()) {
                 map[p.x][p.y].setValue(BLANK);
                 stack.pop();
-                if (!turnStack.empty())
-                    turnStack.pop();
+                if (turnList.size() != 0)
+                    turnList.remove(turnList.size() - 1);
             } else {
                 Mouse np = p.Turn();
                 if (getValue(np) == BLANK) {
                     stack.add(np);
-                } else {
-                    turnStack.pop();
+                    turnList.add(lastTurn);
                 }
             }
         }
@@ -210,7 +235,8 @@ public class Maze {
                  */
                 e.x = x + (turn.peek() - 1) % 2;
                 e.y = y + (turn.peek() - 2) % 2;
-                turnStack.add((turn.peek() + 2) % 4);
+//                turnList.add((turn.peek() + 2) % 4);
+                lastTurn = (turn.peek() + 2) % 4;
                 e.turn.remove((turn.pop() + 2) % 4);
             } else {
                 e = null;

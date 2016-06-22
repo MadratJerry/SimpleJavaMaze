@@ -1,6 +1,9 @@
 package pers.crazymouse.algorithm.visualizer;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.ObservableList;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -11,16 +14,58 @@ import pers.crazymouse.algorithm.std.Maze;
  */
 public class MazePane extends StackPane {
     static final Paint WALL = Color.BLACK;
-    static final Paint BLANK = Color.WHITE;
-    static final Paint OCC = Color.ORANGE;
-    SGridPane mainPane = new SGridPane(20);
+    static final Paint BLANK = Color.TRANSPARENT;
+    static final Paint OCC = Color.GREY;
+    static final Paint DIREC = Color.RED;
+    static final double boxSize = 20;
+
+    private int mazeWidth, mazeHeight;
+    SGridPane mainPane = new SGridPane(boxSize);
+    SGridPane pathPane;
     SimpleIntegerProperty map[][];
     Maze maze;
 
     public MazePane(int mazeWidth, int mazeHeight) {
+        this.mazeWidth = mazeWidth;
+        this.mazeHeight = mazeHeight;
         maze = new Maze(mazeWidth, mazeHeight);
         map = maze.getMap();
-        getChildren().add(mainPane);
+        initPathPane();
+        getChildren().addAll(mainPane, pathPane);
+        maze.getTurnList().addListener(new InvalidationListener() {
+            ObservableList<Integer> list = maze.getTurnList();
+            int size = maze.getTurnList().size();
+            MazeElement e;
+
+            @Override
+            public void invalidated(Observable observable) {
+                if (list.size() > size) {
+                    e = new MazeElement(Maze.DIREC);
+                    pathPane.add(e, maze.getX(), maze.getY());
+                    e.setRotate(maze.getTurnList().get(maze.getTurnList().size() - 1) * 90);
+                } else {
+                    e.setType(Maze.BLANK);
+                }
+                size = list.size();
+            }
+        });
+        maze.getPathList().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                initPathPane();
+                getChildren().add(pathPane);
+            }
+        });
+    }
+
+    private void initPathPane() {
+        pathPane = new SGridPane(boxSize);
+        for (int i = 0; i < mazeWidth; i++) {
+            for (int j = 0; j < mazeHeight; j++) {
+                MazeElement element = new MazeElement(Maze.BLANK);
+                pathPane.add(element, i, j);
+            }
+        }
     }
 
     public void setMap(int[][] map) {

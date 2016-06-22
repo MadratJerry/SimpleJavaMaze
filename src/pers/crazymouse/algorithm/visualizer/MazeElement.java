@@ -10,9 +10,6 @@ import pers.crazymouse.algorithm.std.Maze;
  * Created by crazymouse on 6/22/16.
  */
 public class MazeElement extends ResizablePolygon {
-    public static int WALL = Maze.WALL;
-    public static int BLANK = Maze.BLANK;
-    public static int OCC = Maze.OCC;
     private double[] squarePoints = new double[]{0.0, 0.0, 10.0, 0.0, 10.0, 10.0, 0.0, 10.0};
     private double[] trianglePoints = new double[]{0.0, 0.0, Math.sqrt(3), 1.0, 0.0, 2.0};
 
@@ -22,6 +19,7 @@ public class MazeElement extends ResizablePolygon {
     public MazeElement(int index) {
         type.addListener(new InvalidationListener() {
             @Override
+            // If the value is 0, it doesn't work.
             public void invalidated(Observable observable) {
                 convert(type.getValue());
             }
@@ -31,17 +29,21 @@ public class MazeElement extends ResizablePolygon {
 
     private void convert(int index) {
         getPoints().clear();
-        if (index == WALL) {
+        if (index == Maze.WALL) {
             addPoints(squarePoints);
             setFill(MazePane.WALL);
         }
-        if (index == BLANK) {
+        if (index == Maze.BLANK) {
             addPoints(squarePoints);
             setFill(MazePane.BLANK);
         }
-        if (index == OCC) {
-            addPoints(trianglePoints);
+        if (index == Maze.OCC) {
+            addPoints(squarePoints);
             setFill(MazePane.OCC);
+        }
+        if (index == Maze.DIREC) {
+            addPoints(trianglePoints);
+            setFill(MazePane.DIREC);
         }
         resize();
     }
