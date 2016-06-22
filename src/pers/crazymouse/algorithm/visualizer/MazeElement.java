@@ -12,8 +12,9 @@ import pers.crazymouse.algorithm.std.Maze;
 public class MazeElement extends ResizablePolygon {
     public static int WALL = Maze.WALL;
     public static int BLANK = Maze.BLANK;
+    public static int OCC = Maze.OCC;
     private double[] squarePoints = new double[]{0.0, 0.0, 10.0, 0.0, 10.0, 10.0, 0.0, 10.0};
-    private double[] triangle = new double[]{0.0, 0.0, Math.sqrt(3), 1.0, 0.0, 2.0};
+    private double[] trianglePoints = new double[]{0.0, 0.0, Math.sqrt(3), 1.0, 0.0, 2.0};
 
     Paint fill;
     SimpleIntegerProperty type = new SimpleIntegerProperty();
@@ -31,15 +32,23 @@ public class MazeElement extends ResizablePolygon {
     private void convert(int index) {
         getPoints().clear();
         if (index == WALL) {
-            for (double i : squarePoints)
-                getPoints().add(i);
+            addPoints(squarePoints);
             setFill(MazePane.WALL);
         }
         if (index == BLANK) {
-            for (double i : squarePoints)
-                getPoints().add(i);
+            addPoints(squarePoints);
             setFill(MazePane.BLANK);
         }
+        if (index == OCC) {
+            addPoints(trianglePoints);
+            setFill(MazePane.OCC);
+        }
+        resize();
+    }
+
+    private void addPoints(double[] points) {
+        for (double i : points)
+            getPoints().add(i);
     }
 
     public void setType(int index) {
