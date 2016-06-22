@@ -8,10 +8,15 @@ import java.util.Stack;
  * Created by crazymouse on 6/21/16.
  */
 public class Maze {
-    static final int WALL = 1;
-    static final int BLANK = 0;
-    static final int OCC = -1;
+    public static final int WALL = 1;
+    public static final int BLANK = 0;
+    public static final int OCC = -1;
+
     private SimpleIntegerProperty map[][];
+    private Mouse begin;
+    private Mouse end;
+    private Stack<Mouse> stack = new Stack<>();
+    private Stack<Stack<Integer>> turnStack = new Stack<>(); //TODO record path
 
     public Maze(int width, int height) {
         map = new SimpleIntegerProperty[width][height];
@@ -52,15 +57,12 @@ public class Maze {
     }
 
     private void searchPath(Mouse begin, Mouse end) {
-        int count = 0;
-        Stack<Mouse> stack = new Stack<>();
-        stack.add(begin);
+        setBegin(begin);
         while (!stack.empty()) {
             Mouse p = stack.peek();
             map[p.x][p.y].setValue(OCC);
             if (p.equals(end)) {
                 p.turn.clear();
-                System.out.println(++count);
             }
             if (!p.hasChoice()) {
                 map[p.x][p.y].setValue(BLANK);
@@ -71,6 +73,53 @@ public class Maze {
                     stack.add(np);
             }
         }
+    }
+
+    public void setBegin(Mouse begin) {
+        this.begin = begin;
+        init();
+    }
+
+    public void setBegin(int x, int y) {
+        setBegin(new Mouse(x, y));
+    }
+
+    public void setEnd(Mouse end) {
+        this.end = end;
+    }
+
+    public void setEnd(int x, int y) {
+        setEnd(new Mouse(x, y));
+    }
+
+    private void init() {
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                if (map[i][j].getValue() == OCC)
+                    map[i][j].setValue(BLANK);
+            }
+        }
+        stack.clear();
+        stack.add(begin);
+    }
+
+    public boolean singleStep() {
+        if (!stack.empty()) {
+            Mouse p = stack.peek();
+            map[p.x][p.y].setValue(OCC);
+            if (p.equals(end)) {
+                p.turn.clear();
+            }
+            if (!p.hasChoice()) {
+                map[p.x][p.y].setValue(BLANK);
+                stack.pop();
+            } else {
+                Mouse np = p.Turn();
+                if (getValue(np) == BLANK)
+                    stack.add(np);
+            }
+        }
+        return !stack.empty();
     }
 
     class Mouse implements Comparable<Mouse> {
@@ -134,4 +183,5 @@ public class Maze {
             return e;
         }
     }
+
 }
