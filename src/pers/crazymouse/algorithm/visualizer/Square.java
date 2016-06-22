@@ -1,5 +1,6 @@
 package pers.crazymouse.algorithm.visualizer;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
@@ -89,5 +90,15 @@ public class Square extends Rectangle implements Resizable {
 
     public double getLength() {
         return getWidth();
+    }
+
+    @Override
+    public DoubleProperty getResizableHeight() {
+        return widthProperty();
+    }
+
+    @Override
+    public DoubleProperty getResizableWidth() {
+        return heightProperty();
     }
 }

@@ -2,6 +2,7 @@ package pers.crazymouse.algorithm.visualizer;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -17,7 +18,7 @@ import javafx.scene.shape.Shape;
  * to Square with the settings.
  */
 public class SGridPane extends GridPane {
-    private double length;
+    private SimpleDoubleProperty length = new SimpleDoubleProperty();
 
     /**
      * Creates an Square GridPane, set the length to 5 by default.
@@ -39,7 +40,10 @@ public class SGridPane extends GridPane {
                 if (!(getChildren().get(getChildren().size() - 1) instanceof Resizable)) {
                     getChildren().set(getChildren().size() - 1, new Square(getLength(), Color.BLACK));
                 } else {
-                    getChildren().get(getChildren().size() - 1).resize(getLength(), getLength());
+                    ((Resizable) getChildren().get(getChildren().size() - 1)).
+                            getResizableHeight().bind(getLengthProperty());
+                    ((Resizable) getChildren().get(getChildren().size() - 1)).
+                            getResizableWidth().bind(getLengthProperty());
                 }
             }
         });
@@ -52,10 +56,14 @@ public class SGridPane extends GridPane {
     }
 
     public double getLength() {
-        return length;
+        return length.getValue();
     }
 
     public void setLength(double length) {
-        this.length = length;
+        this.length.setValue(length);
+    }
+
+    public SimpleDoubleProperty getLengthProperty() {
+        return length;
     }
 }

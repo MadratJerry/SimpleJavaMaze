@@ -1,5 +1,9 @@
 package pers.crazymouse.algorithm.visualizer;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Orientation;
 import javafx.scene.shape.Polygon;
 
@@ -10,7 +14,22 @@ public class ResizablePolygon extends Polygon implements Resizable {
     private double currentWidth;
     private double currentHeight;
 
+    DoubleProperty resizableWidth = new SimpleDoubleProperty();
+    DoubleProperty resizableHeight = new SimpleDoubleProperty();
+
     public ResizablePolygon() {
+        resizableWidth.addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                resize(getResizableHeight().getValue(), resizableHeight.getValue());
+            }
+        });
+        resizableHeight.addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                resize(getResizableHeight().getValue(), resizableHeight.getValue());
+            }
+        });
     }
 
     @Override
@@ -60,5 +79,15 @@ public class ResizablePolygon extends Polygon implements Resizable {
     @Override
     public boolean isResizable() {
         return true;
+    }
+
+    @Override
+    public DoubleProperty getResizableWidth() {
+        return resizableWidth;
+    }
+
+    @Override
+    public DoubleProperty getResizableHeight() {
+        return resizableHeight;
     }
 }
