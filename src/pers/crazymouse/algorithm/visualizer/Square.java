@@ -35,7 +35,7 @@ public class Square extends Rectangle implements Resizable {
      * @param color length of the square
      */
     public Square(Paint color) {
-        this(0, color);
+        this(1, color);
     }
 
     /**
@@ -45,6 +45,9 @@ public class Square extends Rectangle implements Resizable {
      * @param fill   determines how to fill the interior of the square
      */
     public Square(double length, Paint fill) {
+        // length can't be set 0 :( why?
+        if (length == 0)
+            length = 1;
         widthProperty().addListener(observable -> setHeight(widthProperty().getValue()));
         heightProperty().addListener(observable -> setWidth(heightProperty().getValue()));
         setLength(length);

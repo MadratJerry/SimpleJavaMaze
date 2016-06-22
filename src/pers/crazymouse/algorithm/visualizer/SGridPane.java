@@ -2,6 +2,7 @@ package pers.crazymouse.algorithm.visualizer;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -17,7 +18,6 @@ import javafx.scene.shape.Shape;
  */
 public class SGridPane extends GridPane {
     private double length;
-    private Paint fill;
 
     /**
      * Creates an Square GridPane, set the length to 5 by default.
@@ -26,45 +26,29 @@ public class SGridPane extends GridPane {
         this(5);
     }
 
-
     /**
      * Creates a new instance of SGridPane with the given length.
      *
      * @param length length of the square
      */
     public SGridPane(double length) {
-        this(length, Color.BLACK);
-    }
-
-
-    /**
-     * Creates a new instance of SGridPane with the given length.
-     *
-     * @param length length of the square
-     * @param fill   determines how to fill the interior of the square
-     */
-    public SGridPane(double length, Paint fill) {
         setLength(length);
-        setFill(fill);
         getChildren().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
                 if (!(getChildren().get(getChildren().size() - 1) instanceof Resizable)) {
-                    getChildren().set(getChildren().size() - 1, new Square(getLength(), fill));
+                    getChildren().set(getChildren().size() - 1, new Square(getLength(), Color.BLACK));
                 } else {
                     getChildren().get(getChildren().size() - 1).resize(getLength(), getLength());
-                    ((Shape) getChildren().get(getChildren().size() - 1)).setFill(getFill());
                 }
             }
         });
     }
 
-    public Paint getFill() {
-        return fill;
-    }
-
-    public void setFill(Paint fill) {
-        this.fill = fill;
+    public void fillAll(Paint fill) {
+        for (Node i : getChildren()) {
+            ((Shape) i).setFill(fill);
+        }
     }
 
     public double getLength() {
