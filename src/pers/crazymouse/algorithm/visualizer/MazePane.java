@@ -119,19 +119,18 @@ public class MazePane extends StackPane {
                 MazeElement element = new MazeElement(i, j, map[i][j].getValue());
                 FadeTransition ft = new FadeTransition(Duration.millis(1000), element);
                 ft.setFromValue(1.0);
-                ft.setToValue(0.1);
+                ft.setToValue(0.5);
                 ft.setCycleCount(2);
                 ft.setAutoReverse(true);
                 element.typeProperty().bind(map[i][j]);
                 // TODO unfinished
                 element.setOnMouseEntered(event -> {
-                    sleep(5);
                     movedX.setValue(element.getX());
                     movedY.setValue(element.getY());
                     ft.play();
+                    ft.jumpTo(Duration.millis(1000));
                 });
                 element.setOnMouseExited(event -> {
-                    sleep(5);
                 });
                 mainPane.add(element, i, j);
             }
