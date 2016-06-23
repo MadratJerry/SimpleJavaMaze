@@ -25,11 +25,10 @@ public class maze extends Application {
     public void start(Stage primaryStage) {
         HBox pane = new HBox(10);
         pane.setAlignment(Pos.CENTER);
-        MazePane mazePane = new MazePane(10, 10);
-        mazePane.setMap(new int[][]{
+        MazePane mazePane = new MazePane(new int[][]{
                 {0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
                 {0, 1, 0, 1, 1, 1, 0, 1, 0, 1},
-                {0, 1, 0, 1, 1, 0, 0, 1, 1, 1},
+                {0, 0, 0, 1, 1, 0, 0, 1, 1, 1},
                 {0, 0, 0, 1, 0, 0, 1, 0, 0, 0},
                 {1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -54,7 +53,6 @@ public class maze extends Application {
         btPane.getChildren().addAll(btFile, btRun, btStep);
 
         pane.getChildren().addAll(mazePane, btPane);
-
         primaryStage.setTitle("Maze pathfinding");
         primaryStage.setScene(new Scene(pane));
         primaryStage.show();

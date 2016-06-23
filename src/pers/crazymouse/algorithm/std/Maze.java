@@ -16,6 +16,9 @@ public class Maze {
     public static final int OCC = -1;
     public static final int DIREC = -2;
 
+    private int width;
+    private int height;
+
     private int lastTurn;
     private SimpleIntegerProperty map[][];
     private Mouse begin;
@@ -43,15 +46,18 @@ public class Maze {
      * @param width  set width of maze
      * @param height set height of maze
      */
-    public Maze(int width, int height) {
-        map = new SimpleIntegerProperty[width][height];
+    public Maze(int[][] map) {
+        setMap(map);
         begin = new Mouse(0, 0);
         end = new Mouse(0, 0);
     }
 
     public void setMap(int[][] map) {
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[i].length; j++) {
+        width = map.length;
+        height = map[0].length;
+        this.map = new SimpleIntegerProperty[width][height];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
                 this.map[i][j] = new SimpleIntegerProperty(map[i][j] + Maze.BLANK - 0);
             }
         }

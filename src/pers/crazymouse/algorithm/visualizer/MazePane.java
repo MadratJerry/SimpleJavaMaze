@@ -9,6 +9,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import pers.crazymouse.algorithm.std.Maze;
 
+import java.util.Stack;
+
 /**
  * Created by crazymouse on 6/22/16.
  */
@@ -17,7 +19,7 @@ public class MazePane extends StackPane {
     static final Paint BLANK = Color.TRANSPARENT;
     static final Paint OCC = Color.GREY;
     static final Paint DIREC = Color.RED;
-    static final double boxSize = 20;
+    static final double boxSize = 30;
 
     private int mazeWidth, mazeHeight;
     SGridPane mainPane = new SGridPane(boxSize);
@@ -25,26 +27,28 @@ public class MazePane extends StackPane {
     SimpleIntegerProperty map[][];
     Maze maze;
 
-    public MazePane(int mazeWidth, int mazeHeight) {
-        this.mazeWidth = mazeWidth;
-        this.mazeHeight = mazeHeight;
-        maze = new Maze(mazeWidth, mazeHeight);
-        map = maze.getMap();
+    public MazePane(int[][] map) {
+        maze = new Maze(map);
+        this.map = maze.getMap();
+        paintMaze();
         initPathPane();
         getChildren().addAll(mainPane, pathPane);
         maze.getTurnList().addListener(new InvalidationListener() {
             ObservableList<Integer> list = maze.getTurnList();
+            Stack<MazeElement> pathList = new Stack<>();
             int size = maze.getTurnList().size();
             MazeElement e;
 
             @Override
             public void invalidated(Observable observable) {
+                System.out.println(pathList.size());
                 if (list.size() > size) {
                     e = new MazeElement(Maze.DIREC);
+                    pathList.add(e);
                     pathPane.add(e, maze.getX(), maze.getY());
                     e.setRotate(maze.getTurnList().get(maze.getTurnList().size() - 1) * 90);
                 } else {
-                    e.setType(Maze.BLANK);
+                    pathPane.getChildren().remove(pathList.pop());
                 }
                 size = list.size();
             }
@@ -52,8 +56,9 @@ public class MazePane extends StackPane {
         maze.getPathList().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
-                initPathPane();
-                getChildren().add(pathPane);
+                System.out.println("!!!");
+//                initPathPane();
+//                getChildren().add(pathPane);
             }
         });
     }
@@ -63,14 +68,31 @@ public class MazePane extends StackPane {
         for (int i = 0; i < mazeWidth; i++) {
             for (int j = 0; j < mazeHeight; j++) {
                 MazeElement element = new MazeElement(Maze.BLANK);
+                element.setOnMouseMoved(event -> {
+                    try {
+                        Thread.currentThread().sleep(10);
+                    } catch (InterruptedException ex) {
+                    }
+                    pathPane.setVisible(false);
+                });
+                element.setOnMouseExited(event -> {
+                    try {
+                        Thread.currentThread().sleep(10);
+                    } catch (InterruptedException ex) {
+                    }
+                    pathPane.setVisible(true);
+                });
                 pathPane.add(element, i, j);
             }
         }
     }
 
     public void setMap(int[][] map) {
+        getChildren().clear();
         maze.setMap(map);
         paintMaze();
+        initPathPane();
+        getChildren().addAll(mainPane, pathPane);
     }
 
     public SimpleIntegerProperty[][] getMap() {
@@ -78,10 +100,13 @@ public class MazePane extends StackPane {
     }
 
     private void paintMaze() {
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[i].length; j++) {
+        mazeWidth = map.length;
+        mazeHeight = map[0].length;
+        for (int i = 0; i < mazeWidth; i++) {
+            for (int j = 0; j < mazeHeight; j++) {
                 MazeElement element = new MazeElement(map[i][j].getValue());
                 element.typeProperty().bind(map[i][j]);
+                element.setOnMouseMoved(event -> element.setFill(Color.YELLOW));
                 mainPane.add(element, i, j);
             }
         }
