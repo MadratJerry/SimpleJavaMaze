@@ -25,7 +25,7 @@ public class MazeElement extends ResizablePolygon {
 
     public MazeElement(int x, int y, int index) {
         setX(x);
-        setType(y);
+        setY(y);
         type.addListener(new InvalidationListener() {
             @Override
             // If the value is 0, it doesn't work.
