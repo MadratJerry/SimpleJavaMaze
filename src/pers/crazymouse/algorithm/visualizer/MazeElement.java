@@ -13,10 +13,19 @@ public class MazeElement extends ResizablePolygon {
     private double[] squarePoints = new double[]{0.0, 0.0, 10.0, 0.0, 10.0, 10.0, 0.0, 10.0};
     private double[] trianglePoints = new double[]{0.0, 0.0, Math.sqrt(3), 1.0, 0.0, 2.0};
 
+    private int x;
+    private int y;
+
     Paint fill;
     SimpleIntegerProperty type = new SimpleIntegerProperty();
 
     public MazeElement(int index) {
+        this(0, 0, index);
+    }
+
+    public MazeElement(int x, int y, int index) {
+        setX(x);
+        setType(y);
         type.addListener(new InvalidationListener() {
             @Override
             // If the value is 0, it doesn't work.
@@ -59,6 +68,22 @@ public class MazeElement extends ResizablePolygon {
 
     public int getType() {
         return type.getValue();
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
 
     public SimpleIntegerProperty typeProperty() {
