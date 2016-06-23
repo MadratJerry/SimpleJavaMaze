@@ -37,6 +37,8 @@ public class SGridPane extends GridPane {
         getChildren().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
+                if (getChildren().size() == 0)
+                    return;
                 if (!(getChildren().get(getChildren().size() - 1) instanceof Resizable)) {
                     getChildren().set(getChildren().size() - 1, new Square(getLength(), Color.BLACK));
                 } else {
