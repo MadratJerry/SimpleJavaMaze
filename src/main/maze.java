@@ -1,11 +1,14 @@
 package main;
 
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pers.crazymouse.algorithm.visualizer.MazePane;
@@ -21,6 +24,7 @@ public class maze extends Application {
         launch(args);
     }
 
+    Text movedText = new Text("(0,0)");
     @Override
     public void start(Stage primaryStage) {
         HBox pane = new HBox(10);
@@ -47,10 +51,24 @@ public class maze extends Application {
         Button btFile = new Button("Maze file");
         Button btRun = new Button("Run!");
         Button btStep = new Button("One step");
+        Button btBestPath = new Button("Show Current Best Path");
+        mazePane.movedXProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                movedText.setText(String.format("(%d,%d)", mazePane.getMovedX(), mazePane.getMovedY()));
+            }
+        });
+        mazePane.movedYProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                movedText.setText(String.format("(%d,%d)", mazePane.getMovedX(), mazePane.getMovedY()));
+            }
+        });
+        btBestPath.disableProperty().bind(mazePane.getHasBestPath().not());
         btFile.setOnAction(event -> fileChooser.showOpenDialog(primaryStage));
         btStep.setOnAction(event -> mazePane.singleStep());
         btRun.setOnAction(event -> mazePane.search());
-        btPane.getChildren().addAll(btFile, btRun, btStep);
+        btPane.getChildren().addAll(btFile, btRun, btStep, btBestPath, movedText);
 
         pane.getChildren().addAll(mazePane, btPane);
         primaryStage.setTitle("Maze pathfinding");

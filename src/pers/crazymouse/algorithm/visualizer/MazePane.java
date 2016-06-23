@@ -2,12 +2,12 @@ package pers.crazymouse.algorithm.visualizer;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Text;
 import pers.crazymouse.algorithm.std.Maze;
 
 import java.util.Stack;
@@ -19,14 +19,18 @@ public class MazePane extends StackPane {
     static final Paint WALL = Color.BLACK;
     static final Paint BLANK = Color.TRANSPARENT;
     static final Paint OCC = Color.GREY;
-    static final Paint DIREC = Color.RED;
-    static final double boxSize = 30;
+    static final Paint DIREC = Color.ORANGE;
+    static final Paint BEST = Color.RED;
+    static final double boxSize = 50;
 
     private int mazeWidth, mazeHeight;
+    private SimpleBooleanProperty hasBestPath = new SimpleBooleanProperty(false);
     SGridPane mainPane = new SGridPane(boxSize);
+    SGridPane bestPathPane = new SGridPane(boxSize);
     SGridPane pathPane;
-    Text xyText = new Text();
     SimpleIntegerProperty map[][];
+    SimpleIntegerProperty movedX = new SimpleIntegerProperty(0);
+    SimpleIntegerProperty movedY = new SimpleIntegerProperty(0);
     Maze maze;
 
     public MazePane(int[][] map) {
@@ -34,7 +38,8 @@ public class MazePane extends StackPane {
         this.map = maze.getMap();
         paintMaze();
         initPathPane();
-        getChildren().addAll(mainPane, pathPane, xyText);
+        getChildren().addAll(mainPane, pathPane, bestPathPane);
+        getChildren().removeAll(bestPathPane, pathPane);
         maze.getTurnList().addListener(new InvalidationListener() {
             ObservableList<Integer> list = maze.getTurnList();
             Stack<MazeElement> pathList = new Stack<>();
@@ -58,7 +63,38 @@ public class MazePane extends StackPane {
         maze.getPathList().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
-                System.out.println("!!!");
+                hasBestPath.setValue(true);
+//                if (maze.getTurnList().size() <= maze.getBestPathLength()) {
+//                    bestPathPane.getChildren().clear();
+//                    for (int i = 0; i < mazeWidth; i++) {
+//                        for (int j = 0; j < mazeHeight; j++) {
+//                            MazeElement element = new MazeElement(Maze.BLANK);
+//
+//                            element.setOnMouseMoved(event -> {
+//                                sleep(1);
+//                                bestPathPane.setVisible(false);
+//                            });
+//                            element.setOnMouseExited(event -> {
+//                                if (!bestPathPane.isVisible()) {
+//                                    sleep(1);
+//                                    bestPathPane.setVisible(true);
+//                                }
+//                            });
+//                            bestPathPane.add(element, i, j);
+//                        }
+//                    }
+//                    int x = 0, y = 0;
+//                    for (int i : maze.getTurnList()) {
+//                        MazeElement e = new MazeElement(Maze.DIREC);
+//                        e.setFill(BEST);
+//                        e.setRotate(i * 90);
+//                        i = (i + 2) % 4;
+//                        x = x + (i - 1) % 2;
+//                        y = y + (i - 2) % 2;
+//                        System.out.println(x + " " + y);
+//                        bestPathPane.add(e, x, y);
+//                    }
+//                }
 //                initPathPane();
 //                getChildren().add(pathPane);
             }
@@ -69,10 +105,12 @@ public class MazePane extends StackPane {
         pathPane = new SGridPane(boxSize);
         for (int i = 0; i < mazeWidth; i++) {
             for (int j = 0; j < mazeHeight; j++) {
-                MazeElement element = new MazeElement(Maze.BLANK);
+                MazeElement element = new MazeElement(i, j, Maze.BLANK);
                 element.setOnMouseMoved(event -> {
                     sleep(1);
                     pathPane.setVisible(false);
+                    movedX.setValue(element.getX());
+                    movedY.setValue(element.getY());
                 });
                 element.setOnMouseExited(event -> {
                     sleep(1);
@@ -108,18 +146,34 @@ public class MazePane extends StackPane {
         mazeHeight = map[0].length;
         for (int i = 0; i < mazeWidth; i++) {
             for (int j = 0; j < mazeHeight; j++) {
-                MazeElement element = new MazeElement(map[i][j].getValue());
+                MazeElement element = new MazeElement(i, j, map[i][j].getValue());
                 element.typeProperty().bind(map[i][j]);
                 // TODO unfinished
                 element.setOnMouseMoved(event -> {
-                    xyText.setText("wow");
+                    movedX.setValue(element.getX());
+                    movedY.setValue(element.getY());
                 });
                 element.setOnMouseExited(event -> {
-                    xyText.setText(":)");
                 });
                 mainPane.add(element, i, j);
             }
         }
+    }
+
+    public int getMovedX() {
+        return movedX.get();
+    }
+
+    public SimpleIntegerProperty movedXProperty() {
+        return movedX;
+    }
+
+    public int getMovedY() {
+        return movedY.get();
+    }
+
+    public SimpleIntegerProperty movedYProperty() {
+        return movedY;
     }
 
     public void setBegin(int x, int y) {
@@ -137,6 +191,10 @@ public class MazePane extends StackPane {
     public void search() {
         maze.searchPath();
         // TODO display animation
+    }
+
+    public SimpleBooleanProperty getHasBestPath() {
+        return hasBestPath;
     }
 
     private Paint getColor(int x) {

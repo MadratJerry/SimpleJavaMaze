@@ -30,6 +30,7 @@ public class Maze {
 
         }
     };
+
     private int bestPathLength = Integer.MAX_VALUE;
     private ObservableList<Stack<Integer>> pathList = new TrackableObservableList<Stack<Integer>>() {
         @Override
@@ -77,6 +78,10 @@ public class Maze {
 
     public void searchPath() {
         searchPath(begin, end);
+    }
+
+    public int getBestPathLength() {
+        return bestPathLength;
     }
 
     public int getValue(int x, int y) {
