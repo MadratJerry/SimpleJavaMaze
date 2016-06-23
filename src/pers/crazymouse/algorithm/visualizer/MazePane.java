@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Text;
 import pers.crazymouse.algorithm.std.Maze;
 
 import java.util.Stack;
@@ -24,6 +25,7 @@ public class MazePane extends StackPane {
     private int mazeWidth, mazeHeight;
     SGridPane mainPane = new SGridPane(boxSize);
     SGridPane pathPane;
+    Text xyText = new Text();
     SimpleIntegerProperty map[][];
     Maze maze;
 
@@ -32,7 +34,7 @@ public class MazePane extends StackPane {
         this.map = maze.getMap();
         paintMaze();
         initPathPane();
-        getChildren().addAll(mainPane, pathPane);
+        getChildren().addAll(mainPane, pathPane, xyText);
         maze.getTurnList().addListener(new InvalidationListener() {
             ObservableList<Integer> list = maze.getTurnList();
             Stack<MazeElement> pathList = new Stack<>();
@@ -69,21 +71,23 @@ public class MazePane extends StackPane {
             for (int j = 0; j < mazeHeight; j++) {
                 MazeElement element = new MazeElement(Maze.BLANK);
                 element.setOnMouseMoved(event -> {
-                    try {
-                        Thread.currentThread().sleep(10);
-                    } catch (InterruptedException ex) {
-                    }
+                    sleep(1);
                     pathPane.setVisible(false);
                 });
                 element.setOnMouseExited(event -> {
-                    try {
-                        Thread.currentThread().sleep(10);
-                    } catch (InterruptedException ex) {
-                    }
+                    sleep(1);
                     pathPane.setVisible(true);
                 });
                 pathPane.add(element, i, j);
             }
+        }
+    }
+
+    private void sleep(long time) {
+        try {
+            Thread.currentThread().sleep(time);
+        } catch (InterruptedException ex) {
+            return;
         }
     }
 
@@ -106,7 +110,13 @@ public class MazePane extends StackPane {
             for (int j = 0; j < mazeHeight; j++) {
                 MazeElement element = new MazeElement(map[i][j].getValue());
                 element.typeProperty().bind(map[i][j]);
-                element.setOnMouseMoved(event -> element.setFill(Color.YELLOW));
+                // TODO unfinished
+                element.setOnMouseMoved(event -> {
+                    xyText.setText("wow");
+                });
+                element.setOnMouseExited(event -> {
+                    xyText.setText(":)");
+                });
                 mainPane.add(element, i, j);
             }
         }
