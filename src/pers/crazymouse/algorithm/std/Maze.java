@@ -11,10 +11,10 @@ import java.util.Stack;
  * Created by crazymouse on 6/21/16.
  */
 public class Maze {
-    public static final int BLANK = 1;
+    public static final int BLANK = 0;
     public static final int WALL = BLANK + 1;
-    public static final int OCC = -1;
-    public static final int DIREC = -2;
+    public static final int OCC = 2;
+    public static final int DIREC = -1;
 
     private int width;
     private int height;
@@ -23,7 +23,7 @@ public class Maze {
     private SimpleIntegerProperty map[][];
     private Mouse begin;
     private Mouse end;
-    private Stack<Mouse> stack = new Stack<>();
+    private volatile Stack<Mouse> stack = new Stack<>();
     private ObservableList<Integer> turnList = new TrackableObservableList<Integer>() {
         @Override
         protected void onChanged(ListChangeListener.Change<Integer> c) {
@@ -44,8 +44,7 @@ public class Maze {
      * Initialize the size of maze.
      * Initialize the begin and end Mouse for (0, 0)
      *
-     * @param width  set width of maze
-     * @param height set height of maze
+     * @param map
      */
     public Maze(int[][] map) {
         setMap(map);
@@ -59,7 +58,7 @@ public class Maze {
         this.map = new SimpleIntegerProperty[width][height];
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                this.map[i][j] = new SimpleIntegerProperty(map[i][j] + Maze.BLANK - 0);
+                this.map[i][j] = new SimpleIntegerProperty(map[i][j]);
             }
         }
     }
@@ -153,6 +152,7 @@ public class Maze {
             Mouse p = stack.peek();
             map[p.x][p.y].setValue(OCC);
             if (p.equals(end)) {
+                System.out.println(pathList.size());
                 p.turn.clear();
                 Stack<Integer> turnStack = new Stack<>();
                 for (int i : turnList)
@@ -174,7 +174,6 @@ public class Maze {
         }
         return !stack.empty();
     }
-
 
     // test function
     private void showPath() {
@@ -246,7 +245,7 @@ public class Maze {
                  */
                 e.x = x + (turn.peek() - 1) % 2;
                 e.y = y + (turn.peek() - 2) % 2;
-//                turnList.add((turn.peek() + 2) % 4);
+                turnList.add((turn.peek() + 2) % 4);
                 lastTurn = (turn.peek() + 2) % 4;
                 e.turn.remove((turn.pop() + 2) % 4);
             } else {

@@ -5,14 +5,11 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.collections.ObservableList;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 import pers.crazymouse.algorithm.std.Maze;
-
-import java.util.Stack;
 
 /**
  * Created by crazymouse on 6/22/16.
@@ -23,7 +20,7 @@ public class MazePane extends StackPane {
     static final Paint OCC = Color.GREY;
     static final Paint DIREC = Color.ORANGE;
     static final Paint BEST = Color.RED;
-    static final double boxSize = 50;
+    static final double boxSize = 30;
 
     private int mazeWidth, mazeHeight;
     private SimpleBooleanProperty hasBestPath = new SimpleBooleanProperty(false);
@@ -42,26 +39,26 @@ public class MazePane extends StackPane {
         initPathPane();
         getChildren().addAll(mainPane, pathPane, bestPathPane);
         getChildren().removeAll(bestPathPane);
-        maze.getTurnList().addListener(new InvalidationListener() {
-            ObservableList<Integer> list = maze.getTurnList();
-            Stack<MazeElement> pathList = new Stack<>();
-            int size = maze.getTurnList().size();
-            MazeElement e;
-
-            @Override
-            public void invalidated(Observable observable) {
-                System.out.println(pathList.size());
-                if (list.size() > size) {
-                    e = new MazeElement(Maze.DIREC);
-                    pathList.add(e);
-                    pathPane.add(e, maze.getX(), maze.getY());
-                    e.setRotate(maze.getTurnList().get(maze.getTurnList().size() - 1) * 90);
-                } else {
-                    pathPane.getChildren().remove(pathList.pop());
-                }
-                size = list.size();
-            }
-        });
+//        maze.getTurnList().addListener(new InvalidationListener() {
+//            ObservableList<Integer> list = maze.getTurnList();
+//            Stack<MazeElement> pathList = new Stack<>();
+//            int size = maze.getTurnList().size();
+//            MazeElement e;
+//
+//            @Override
+//            public void invalidated(Observable observable) {
+//                System.out.println(pathList.size());
+//                if (list.size() > size) {
+//                    e = new MazeElement(Maze.DIREC);
+//                    pathList.add(e);
+//                    pathPane.add(e, maze.getX(), maze.getY());
+//                    e.setRotate(maze.getTurnList().get(maze.getTurnList().size() - 1) * 90);
+//                } else {
+//                    pathPane.getChildren().remove(pathList.pop());
+//                }
+//                size = list.size();
+//            }
+//        });
         maze.getPathList().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
@@ -119,10 +116,11 @@ public class MazePane extends StackPane {
                 MazeElement element = new MazeElement(i, j, map[i][j].getValue());
                 FadeTransition ft = new FadeTransition(Duration.millis(1000), element);
                 ft.setFromValue(1.0);
-                ft.setToValue(0.5);
+                ft.setToValue(0.7);
                 ft.setCycleCount(2);
                 ft.setAutoReverse(true);
                 element.typeProperty().bind(map[i][j]);
+//                element.fillProperty().bind(map[i][j]);
                 // TODO unfinished
                 element.setOnMouseEntered(event -> {
                     movedX.setValue(element.getX());
@@ -166,8 +164,19 @@ public class MazePane extends StackPane {
     }
 
     public void search() {
-        maze.searchPath();
-        // TODO display animation
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (singleStep()) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+        thread.start();
     }
 
     public SimpleBooleanProperty getHasBestPath() {

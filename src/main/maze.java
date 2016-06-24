@@ -25,23 +25,24 @@ public class maze extends Application {
     }
 
     Text movedText = new Text("(0,0)");
+
     @Override
     public void start(Stage primaryStage) {
         HBox pane = new HBox(10);
         pane.setAlignment(Pos.CENTER);
         MazePane mazePane = new MazePane(new int[][]{
-                {0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
-                {0, 1, 0, 1, 1, 1, 0, 1, 0, 1},
-                {0, 0, 0, 1, 1, 0, 0, 1, 1, 1},
-                {0, 0, 0, 1, 0, 0, 1, 0, 0, 0},
-                {1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
+                {0, 0, 1, 1, 1, 0, 0, 1, 1, 1},
+                {0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
                 {0, 0, 1, 1, 1, 0, 0, 1, 1, 1},
                 {0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}});
         mazePane.setBegin(0, 0);
-        mazePane.setEnd(3, 2);
+        mazePane.setEnd(9, 9);
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
