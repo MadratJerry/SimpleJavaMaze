@@ -20,7 +20,7 @@ public class MazePane extends StackPane {
     static final Paint OCC = Color.GREY;
     static final Paint DIREC = Color.ORANGE;
     static final Paint BEST = Color.RED;
-    static final double boxSize = 30;
+    static final double boxSize = 3;
 
     private int mazeWidth, mazeHeight;
     private SimpleBooleanProperty hasBestPath = new SimpleBooleanProperty(false);
@@ -37,8 +37,7 @@ public class MazePane extends StackPane {
         this.map = maze.getMap();
         paintMaze();
         initPathPane();
-        getChildren().addAll(mainPane, pathPane, bestPathPane);
-        getChildren().removeAll(bestPathPane);
+        getChildren().addAll(mainPane);
 //        maze.getTurnList().addListener(new InvalidationListener() {
 //            ObservableList<Integer> list = maze.getTurnList();
 //            Stack<MazeElement> pathList = new Stack<>();
@@ -96,11 +95,12 @@ public class MazePane extends StackPane {
     }
 
     public void setMap(int[][] map) {
-        getChildren().clear();
+//        getChildren().clear();
         maze.setMap(map);
+        this.map = maze.getMap();
         paintMaze();
         initPathPane();
-        getChildren().addAll(mainPane, pathPane);
+//        getChildren().addAll(mainPane, pathPane);
     }
 
     public SimpleIntegerProperty[][] getMap() {
@@ -110,13 +110,14 @@ public class MazePane extends StackPane {
     private void paintMaze() {
         mazeHeight = map.length;
         mazeWidth = map[0].length;
+        mainPane.getChildren().clear();
 
         for (int i = 0; i < mazeHeight; i++) {
             for (int j = 0; j < mazeWidth; j++) {
                 MazeElement element = new MazeElement(i, j, map[i][j].getValue());
                 FadeTransition ft = new FadeTransition(Duration.millis(1000), element);
                 ft.setFromValue(1.0);
-                ft.setToValue(0.7);
+                ft.setToValue(0.5);
                 ft.setCycleCount(2);
                 ft.setAutoReverse(true);
                 element.typeProperty().bind(map[i][j]);
