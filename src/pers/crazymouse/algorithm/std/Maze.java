@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
+import java.util.Random;
 import java.util.Stack;
 
 /**
@@ -14,6 +15,7 @@ public class Maze {
     public static final int BLANK = 0;
     public static final int WALL = BLANK + 1;
     public static final int OCC = 2;
+    public static final int VISIT = 3;
     public static final int DIREC = -1;
 
     private int width;
@@ -100,24 +102,37 @@ public class Maze {
     private void searchPath(Mouse begin, Mouse end) {
         setBegin(begin);
         setEnd(end);
-        while (singleStep()) ;
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (singleStep()) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+        thread.setPriority(1);
+        thread.start();
     }
 
     public void setBegin(Mouse begin) {
-        this.begin = begin;
-        init();
+        setBegin(begin.x, begin.y);
     }
 
     public void setBegin(int x, int y) {
-        setBegin(new Mouse(x, y));
+        this.begin = new Mouse(x, y);
+        init();
     }
 
     public void setEnd(Mouse end) {
-        this.end = end;
+        setEnd(end.x, end.y);
     }
 
     public void setEnd(int x, int y) {
-        setEnd(new Mouse(x, y));
+        this.end = new Mouse(x, y);
     }
 
     private void init() {
@@ -152,7 +167,6 @@ public class Maze {
             Mouse p = stack.peek();
             map[p.x][p.y].setValue(OCC);
             if (p.equals(end)) {
-                System.out.println(pathList.size());
                 p.turn.clear();
                 Stack<Integer> turnStack = new Stack<>();
                 for (int i : turnList)
@@ -165,7 +179,7 @@ public class Maze {
                 if (turnList.size() != 0)
                     turnList.remove(turnList.size() - 1);
             } else {
-                Mouse np = p.Turn();
+                Mouse np = p.Turn(1);
                 if (getValue(np) == BLANK) {
                     stack.add(np);
                     turnList.add(lastTurn);
@@ -173,6 +187,66 @@ public class Maze {
             }
         }
         return !stack.empty();
+    }
+
+    public void clearMapWithValue(int value) {
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                map[i][j].setValue(value);
+            }
+            try {
+                Thread.currentThread().sleep(5);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public void generation() {
+        setBegin(1, 1);
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                clearMapWithValue(WALL);
+                while (generationStep()) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+        thread.setPriority(10);
+        thread.start();
+    }
+
+    private boolean generationStep() {
+        if (!stack.empty()) {
+            Mouse p = stack.peek();
+            map[p.x][p.y].setValue(VISIT);
+            if (!p.hasChoice()) {
+                map[p.x][p.y].set(BLANK);
+                stack.pop();
+            } else {
+                Mouse np = p.Turn(2);
+                if (getValue(np) != VISIT && getValue(np) != BLANK && isVaild(np)) {
+                    int t = 6;
+                    for (int i : np.turn)
+                        t -= i;
+                    int x = np.x + ((t - 1) % 2);
+                    int y = np.y + ((t - 2) % 2);
+                    map[x][y].setValue(BLANK);
+                    stack.add(np);
+                }
+            }
+        }
+        return !stack.empty();
+    }
+
+    private boolean isVaild(Mouse e) {
+        return e.x >= 0 && e.x < map.length && e.y >= 0 && e.y < map[0].length;
     }
 
     // test function
@@ -237,17 +311,25 @@ public class Maze {
         /**
          * @return
          */
-        Mouse Turn() {
+        Mouse Turn(int d) {
             Mouse e = new Mouse();
             if (hasChoice()) {
                 /**
                  * It's a trick :)
                  */
-                e.x = x + (turn.peek() - 1) % 2;
-                e.y = y + (turn.peek() - 2) % 2;
-                turnList.add((turn.peek() + 2) % 4);
-                lastTurn = (turn.peek() + 2) % 4;
-                e.turn.remove((turn.pop() + 2) % 4);
+                int index;
+                if (turn.size() == 1) {
+                    index = 0;
+                } else {
+                    index = new Random(System.currentTimeMillis()).nextInt(turn.size());
+                }
+                int t = turn.get(index);
+                e.x = x + ((t - 1) % 2) * d;
+                e.y = y + ((t - 2) % 2) * d;
+                turnList.add((t + 2) % 4);
+                lastTurn = (t + 2) % 4;
+                turn.remove(index);
+                e.turn.remove((t + 2) % 4);
             } else {
                 e = null;
             }

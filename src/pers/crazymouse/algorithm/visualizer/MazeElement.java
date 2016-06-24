@@ -60,6 +60,9 @@ public class MazeElement extends ResizablePolygon {
         if (index == Maze.DIREC) {
             setFill(MazePane.DIREC);
         }
+        if (index == Maze.VISIT) {
+            setFill(MazePane.VISIT);
+        }
         lastType = type.getValue();
     }
 

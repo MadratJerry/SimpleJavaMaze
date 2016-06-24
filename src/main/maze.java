@@ -36,7 +36,9 @@ public class maze extends Application {
     public void start(Stage primaryStage) {
         HBox pane = new HBox(10);
         pane.setAlignment(Pos.CENTER);
-//        MazePane mazePane = new MazePane(new int[][]{
+//        mazeFile = new File("/Users/crazymouse/Codes/big.txt");
+        map = new int[201][301];
+//        map = new int[][]{
 //                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 //                {1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
 //                {0, 0, 1, 1, 1, 0, 0, 1, 1, 1},
@@ -46,9 +48,12 @@ public class maze extends Application {
 //                {1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
 //                {0, 0, 1, 1, 1, 0, 0, 1, 1, 1},
 //                {0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
-//                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}});
-        mazeFile = new File("/Users/crazymouse/Codes/test.txt");
-        loadMaze();
+//                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+        for (int i = 0; i < 201; i++) {
+            for (int j = 0; j < 301; j++) {
+                map[i][j] = 0;
+            }
+        }
         mazePane = new MazePane(map);
         mazePane.setBegin(1, 1);
         mazePane.setEnd(199, 199);
@@ -62,6 +67,7 @@ public class maze extends Application {
         Button btRun = new Button("Run!");
         Button btStep = new Button("One step");
         Button btBestPath = new Button("Show Current Best Path");
+        Button btTest = new Button("test");
         mazePane.movedXProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
@@ -78,7 +84,8 @@ public class maze extends Application {
         btFile.setOnAction(event -> fileChooser.showOpenDialog(primaryStage));
         btStep.setOnAction(event -> mazePane.singleStep());
         btRun.setOnAction(event -> mazePane.search());
-        btPane.getChildren().addAll(btFile, btRun, btStep, btBestPath, movedText);
+        btTest.setOnAction(event -> mazePane.generation());
+        btPane.getChildren().addAll(btFile, btRun, btStep, btBestPath, btTest, movedText);
 
         pane.getChildren().addAll(mazePane, btPane);
         primaryStage.setTitle("Maze pathfinding");

@@ -20,7 +20,8 @@ public class MazePane extends StackPane {
     static final Paint OCC = Color.GREY;
     static final Paint DIREC = Color.ORANGE;
     static final Paint BEST = Color.RED;
-    static final double boxSize = 3;
+    static final Paint VISIT = Color.RED;
+    static final double boxSize = 2;
 
     private int mazeWidth, mazeHeight;
     private SimpleBooleanProperty hasBestPath = new SimpleBooleanProperty(false);
@@ -128,9 +129,9 @@ public class MazePane extends StackPane {
                     movedY.setValue(element.getY());
                     ft.play();
                     ft.jumpTo(Duration.millis(1000));
+                    ft.pause();
                 });
-                element.setOnMouseExited(event -> {
-                });
+                element.setOnMouseExited(event -> ft.play());
                 mainPane.add(element, i, j);
             }
         }
@@ -164,20 +165,12 @@ public class MazePane extends StackPane {
         return maze.singleStep();
     }
 
+    public void generation() {
+        maze.generation();
+    }
+
     public void search() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (singleStep()) {
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
-        });
-        thread.start();
+        maze.searchPath();
     }
 
     public SimpleBooleanProperty getHasBestPath() {
