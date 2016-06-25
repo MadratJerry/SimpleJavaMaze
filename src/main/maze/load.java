@@ -75,9 +75,11 @@ public class load extends Application {
                 if (pattern.matcher(widthStr).matches() && pattern.matcher(heightStr).matches()) {
                     width = Integer.parseInt(widthStr);
                     height = Integer.parseInt(heightStr);
-                    map = new int[width + 1][height + 1];
-                    for (int i = 0; i <= width; i++) {
-                        for (int j = 0; j <= height; j++) {
+                    width = width + width % 2 + 1;
+                    height = height + height % 2 + 1;
+                    map = new int[width][height];
+                    for (int i = 0; i < width; i++) {
+                        for (int j = 0; j < height; j++) {
                             map[i][j] = Maze.BLANK;
                         }
                     }

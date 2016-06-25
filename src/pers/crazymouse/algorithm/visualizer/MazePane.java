@@ -100,15 +100,6 @@ public class MazePane extends StackPane {
         }
     }
 
-    public void setMap(int[][] map) {
-//        getChildren().clear();
-        maze.setMap(map);
-        this.map = maze.getMap();
-        paintMaze();
-        initPathPane();
-//        getChildren().addAll(mainPane, pathPane);
-    }
-
     public SimpleIntegerProperty[][] getMap() {
         return map;
     }
@@ -178,15 +169,6 @@ public class MazePane extends StackPane {
 
     public SimpleBooleanProperty getHasBestPath() {
         return hasBestPath;
-    }
-
-    private Paint getColor(int x) {
-        if (x == Maze.WALL)
-            return WALL;
-        else if (x == Maze.BLANK)
-            return BLANK;
-        else
-            return OCC;
     }
 
     public double getBoxSize() {

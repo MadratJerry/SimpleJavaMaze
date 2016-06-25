@@ -54,7 +54,7 @@ public class Maze {
         end = new Mouse(0, 0);
     }
 
-    public void setMap(int[][] map) {
+    private void setMap(int[][] map) {
         width = map.length;
         height = map[0].length;
         this.map = new SimpleIntegerProperty[width][height];
@@ -216,6 +216,7 @@ public class Maze {
                         ex.printStackTrace();
                     }
                 }
+                setBegin(begin);
             }
         });
         thread.setPriority(10);
