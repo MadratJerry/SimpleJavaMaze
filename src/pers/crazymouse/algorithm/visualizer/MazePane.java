@@ -1,6 +1,6 @@
 package pers.crazymouse.algorithm.visualizer;
 
-import javafx.animation.FadeTransition;
+import javafx.animation.FillTransition;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -34,7 +34,9 @@ public class MazePane extends StackPane {
     SGridPane bestPathPane;
     SGridPane pathPane;
     SimpleIntegerProperty map[][];
-    MazeElement eleMap[][];
+    MazeElement pathMap[][];
+    MazeElement mazeMap[][];
+    FillTransition ftMap[][];
     SimpleIntegerProperty movedX = new SimpleIntegerProperty(0);
     SimpleIntegerProperty movedY = new SimpleIntegerProperty(0);
     Maze maze;
@@ -59,12 +61,12 @@ public class MazePane extends StackPane {
     }
 
     private void initPathPane() {
-        eleMap = new MazeElement[mazeWidth][mazeHeight];
+        pathMap = new MazeElement[mazeWidth][mazeHeight];
         pathPane = new SGridPane(boxSize);
         for (int i = 0; i < mazeHeight; i++) {
             for (int j = 0; j < mazeWidth; j++) {
                 MazeElement element = new MazeElement(i, j, Maze.BLANK);
-                eleMap[i][j] = element;
+                pathMap[i][j] = element;
                 element.setOnMouseEntered(event -> {
                     sleep(5);
                     pathPane.setMouseTransparent(true);
@@ -92,17 +94,33 @@ public class MazePane extends StackPane {
         return map;
     }
 
+    int X, Y;
+
     private void paintMaze() {
         mainPane.getChildren().clear();
+        mazeMap = new MazeElement[mazeHeight][mazeWidth];
+        ftMap = new FillTransition[mazeHeight][mazeWidth];
         for (int i = 0; i < mazeHeight; i++) {
             for (int j = 0; j < mazeWidth; j++) {
                 MazeElement element = new MazeElement(i, j, map[i][j].getValue());
-                FadeTransition ft = new FadeTransition(Duration.millis(1000), element);
-                ft.setFromValue(1.0);
-                ft.setToValue(0.5);
+                mazeMap[i][j] = element;
+                FillTransition ft = new FillTransition(Duration.millis(1000), element);
+                ftMap[i][j] = ft;
+                element.typeProperty().bind(map[i][j]);
+                X = i;
+                Y = j;
+                map[i][j].addListener(new InvalidationListener() {
+                    int x = X;
+                    int y = Y;
+
+                    @Override
+                    public void invalidated(Observable observable) {
+                        setAnimation(mazeMap[x][y]);
+                    }
+                });
+
                 ft.setCycleCount(2);
                 ft.setAutoReverse(true);
-                element.typeProperty().bind(map[i][j]);
                 element.setOnMouseEntered(event -> {
                     movedX.setValue(element.getX());
                     movedY.setValue(element.getY());
@@ -111,8 +129,31 @@ public class MazePane extends StackPane {
                     ft.pause();
                 });
                 element.setOnMouseExited(event -> ft.play());
+
+
+                setAnimation(element);
                 mainPane.add(element, i, j);
             }
+        }
+    }
+
+    private void setAnimation(MazeElement element) {
+        FillTransition ft = ftMap[element.getX()][element.getY()];
+        if (element.getType() == Maze.WALL) {
+            ft.setFromValue((Color) MazePane.WALL);
+            ft.setToValue(Color.DARKGRAY);
+        }
+        if (element.getType() == Maze.BLANK) {
+            ft.setFromValue((Color) MazePane.BLANK);
+            ft.setToValue(Color.LIGHTGREEN);
+        }
+        if (element.getType() == Maze.OCC) {
+            ft.setFromValue((Color) MazePane.OCC);
+            ft.setToValue(Color.LIGHTGOLDENRODYELLOW);
+        }
+        if (element.getType() == Maze.VISIT) {
+            ft.setFromValue((Color) MazePane.VISIT);
+            ft.setToValue(Color.LIGHTPINK);
         }
     }
 
@@ -198,13 +239,18 @@ public class MazePane extends StackPane {
                 }
                 setBegin(beginX, beginY);
                 running.setValue(false);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         thread.setPriority(10);
         thread.start();
     }
 
-    public void showBestPath() {
+    public Stack<Integer> getBestTurnStack() {
         ObservableList<Stack<Integer>> bestPathList = maze.getPathList();
         Stack<Integer> bestTurnStack = new Stack<>();
         int bestPathLenth = -1;
@@ -214,17 +260,23 @@ public class MazePane extends StackPane {
                 bestTurnStack = i;
             }
         }
-        showPath(bestTurnStack);
+        return bestTurnStack;
+    }
+
+    public void showBestPath() {
+
+        showPath(getBestTurnStack());
     }
 
     public void showPath(Stack<Integer> bestTurnStack) {
         pathPane.setVisible(true);
         for (int i = 0; i < mazeHeight; i++) {
             for (int j = 0; j < mazeWidth; j++) {
-                if (eleMap[i][j].getType() == Maze.DIREC)
-                    eleMap[i][j].setType(Maze.BLANK);
+                if (pathMap[i][j].getType() == Maze.DIREC)
+                    pathMap[i][j].setType(Maze.BLANK);
             }
         }
+
         int x = beginX;
         int y = beginY;
         for (int i : bestTurnStack) {
@@ -234,9 +286,10 @@ public class MazePane extends StackPane {
             y = y + (t - 2) % 2;
             if (x == endX && y == endY)
                 break;
-            if (eleMap[x][y].getType() != Maze.DIREC)
-                eleMap[x][y].setType(Maze.DIREC);
-            eleMap[x][y].setRotate((t - 2) * 90);
+            if (pathMap[x][y].getType() != Maze.DIREC)
+                pathMap[x][y].setType(Maze.DIREC);
+            pathMap[x][y].setRotate((t - 2) * 90);
+
         }
     }
 
