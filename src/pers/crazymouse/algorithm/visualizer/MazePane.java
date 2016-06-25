@@ -5,11 +5,14 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.ObservableList;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 import pers.crazymouse.algorithm.std.Maze;
+
+import java.util.Stack;
 
 /**
  * Created by crazymouse on 6/22/16.
@@ -18,7 +21,7 @@ public class MazePane extends StackPane {
     static final Paint WALL = Color.BLACK;
     static final Paint BLANK = Color.TRANSPARENT;
     static final Paint OCC = Color.GREY;
-    static final Paint DIREC = Color.ORANGE;
+    static final Paint DIREC = Color.GREEN;
     static final Paint BEST = Color.RED;
     static final Paint VISIT = Color.RED;
     private double boxSize;
@@ -31,6 +34,7 @@ public class MazePane extends StackPane {
     SGridPane bestPathPane;
     SGridPane pathPane;
     SimpleIntegerProperty map[][];
+    MazeElement eleMap[][];
     SimpleIntegerProperty movedX = new SimpleIntegerProperty(0);
     SimpleIntegerProperty movedY = new SimpleIntegerProperty(0);
     Maze maze;
@@ -45,7 +49,7 @@ public class MazePane extends StackPane {
         bestPathPane = new SGridPane(boxSize);
         paintMaze();
         initPathPane();
-        getChildren().addAll(mainPane);
+        getChildren().addAll(mainPane, pathPane);
         maze.getPathList().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
@@ -55,10 +59,12 @@ public class MazePane extends StackPane {
     }
 
     private void initPathPane() {
+        eleMap = new MazeElement[mazeWidth][mazeHeight];
         pathPane = new SGridPane(boxSize);
         for (int i = 0; i < mazeHeight; i++) {
             for (int j = 0; j < mazeWidth; j++) {
                 MazeElement element = new MazeElement(i, j, Maze.BLANK);
+                eleMap[i][j] = element;
                 element.setOnMouseEntered(event -> {
                     sleep(5);
                     pathPane.setMouseTransparent(true);
@@ -88,7 +94,6 @@ public class MazePane extends StackPane {
 
     private void paintMaze() {
         mainPane.getChildren().clear();
-
         for (int i = 0; i < mazeHeight; i++) {
             for (int j = 0; j < mazeWidth; j++) {
                 MazeElement element = new MazeElement(i, j, map[i][j].getValue());
@@ -98,8 +103,6 @@ public class MazePane extends StackPane {
                 ft.setCycleCount(2);
                 ft.setAutoReverse(true);
                 element.typeProperty().bind(map[i][j]);
-//                element.fillProperty().bind(map[i][j]);
-                // TODO unfinished
                 element.setOnMouseEntered(event -> {
                     movedX.setValue(element.getX());
                     movedY.setValue(element.getY());
@@ -146,10 +149,12 @@ public class MazePane extends StackPane {
     }
 
     public void generation() {
-        setBegin(1, 1);
+        pathPane.setVisible(false);
+        hasBestPath.setValue(false);
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
+                setBegin(1, 1);
                 running.setValue(true);
                 for (int j = 0; j < mazeWidth; j++) {
                     for (int i = 0; i < mazeHeight; i++) {
@@ -177,12 +182,13 @@ public class MazePane extends StackPane {
     }
 
     public void search() {
-        setBegin(beginX, beginY);
-        setEnd(mazeHeight - 1, mazeWidth - 1);
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 running.setValue(true);
+                setBegin(beginX, beginY);
+                setEnd(endX, endY);
+                maze.getTurnList().clear();
                 while (maze.searchStep()) {
                     try {
                         Thread.sleep(1);
@@ -196,6 +202,42 @@ public class MazePane extends StackPane {
         });
         thread.setPriority(10);
         thread.start();
+    }
+
+    public void showBestPath() {
+        ObservableList<Stack<Integer>> bestPathList = maze.getPathList();
+        Stack<Integer> bestTurnStack = new Stack<>();
+        int bestPathLenth = -1;
+        for (Stack<Integer> i : bestPathList) {
+            if (i.size() > -1) {
+                bestPathLenth = i.size();
+                bestTurnStack = i;
+            }
+        }
+        showPath(bestTurnStack);
+    }
+
+    public void showPath(Stack<Integer> bestTurnStack) {
+        pathPane.setVisible(true);
+        for (int i = 0; i < mazeHeight; i++) {
+            for (int j = 0; j < mazeWidth; j++) {
+                if (eleMap[i][j].getType() == Maze.DIREC)
+                    eleMap[i][j].setType(Maze.BLANK);
+            }
+        }
+        int x = beginX;
+        int y = beginY;
+        for (int i : bestTurnStack) {
+            int t = i;
+            t = (t + 2) % 4;
+            x = x + (t - 1) % 2;
+            y = y + (t - 2) % 2;
+            if (x == endX && y == endY)
+                break;
+            if (eleMap[x][y].getType() != Maze.DIREC)
+                eleMap[x][y].setType(Maze.DIREC);
+            eleMap[x][y].setRotate((t - 2) * 90);
+        }
     }
 
     public SimpleBooleanProperty hasBestPathProperty() {

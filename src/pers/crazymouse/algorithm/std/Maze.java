@@ -46,7 +46,7 @@ public class Maze {
      * Initialize the size of main.
      * Initialize the begin and end Mouse for (0, 0)
      *
-     * @param map
+     * @param map 01 map array
      */
     public Maze(int[][] map) {
         setMap(map);
@@ -125,7 +125,7 @@ public class Maze {
     private void init() {
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
-                if (map[i][j].getValue() == OCC)
+                if (map[i][j].getValue() != WALL)
                     map[i][j].setValue(BLANK);
             }
         }
@@ -294,7 +294,6 @@ public class Maze {
                 int t = turn.get(index);
                 e.x = x + ((t - 1) % 2) * d;
                 e.y = y + ((t - 2) % 2) * d;
-                turnList.add((t + 2) % 4);
                 lastTurn = (t + 2) % 4;
                 turn.remove(index);
                 e.turn.remove((t + 2) % 4);

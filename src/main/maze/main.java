@@ -35,7 +35,7 @@ public class main extends Application {
         pane.setAlignment(Pos.CENTER);
         mazePane = new MazePane(map);
         mazePane.setBegin(1, 1);
-        mazePane.setEnd(199, 199);
+        mazePane.setEnd(9, 9);
 
         VBox btPane = new VBox(10);
         btPane.setAlignment(Pos.CENTER);
@@ -56,6 +56,7 @@ public class main extends Application {
             }
         });
         btBestPath.disableProperty().bind(mazePane.hasBestPathProperty().not());
+        btBestPath.setOnAction(event -> mazePane.showBestPath());
         btStep.setOnAction(event -> mazePane.singleStep());
         btStep.disableProperty().bind(mazePane.runningProperty());
         btRun.setOnAction(event -> mazePane.search());
