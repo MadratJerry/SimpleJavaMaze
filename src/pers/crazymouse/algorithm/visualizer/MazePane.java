@@ -21,12 +21,12 @@ public class MazePane extends StackPane {
     static final Paint DIREC = Color.ORANGE;
     static final Paint BEST = Color.RED;
     static final Paint VISIT = Color.RED;
-    static final double boxSize = 2;
+    private double boxSize;
 
     private int mazeWidth, mazeHeight;
     private SimpleBooleanProperty hasBestPath = new SimpleBooleanProperty(false);
-    SGridPane mainPane = new SGridPane(boxSize);
-    SGridPane bestPathPane = new SGridPane(boxSize);
+    SGridPane mainPane;
+    SGridPane bestPathPane;
     SGridPane pathPane;
     SimpleIntegerProperty map[][];
     SimpleIntegerProperty movedX = new SimpleIntegerProperty(0);
@@ -36,13 +36,18 @@ public class MazePane extends StackPane {
     public MazePane(int[][] map) {
         maze = new Maze(map);
         this.map = maze.getMap();
+        mazeHeight = map.length;
+        mazeWidth = map[0].length;
+        boxSize = Math.floor(Math.min(900 / mazeHeight, 1440 / mazeWidth)) - 1;
+        mainPane = new SGridPane(boxSize);
+        bestPathPane = new SGridPane(boxSize);
         paintMaze();
         initPathPane();
         getChildren().addAll(mainPane);
-//        maze.getTurnList().addListener(new InvalidationListener() {
-//            ObservableList<Integer> list = maze.getTurnList();
+//        main.getTurnList().addListener(new InvalidationListener() {
+//            ObservableList<Integer> list = main.getTurnList();
 //            Stack<MazeElement> pathList = new Stack<>();
-//            int size = maze.getTurnList().size();
+//            int size = main.getTurnList().size();
 //            MazeElement e;
 //
 //            @Override
@@ -51,8 +56,8 @@ public class MazePane extends StackPane {
 //                if (list.size() > size) {
 //                    e = new MazeElement(Maze.DIREC);
 //                    pathList.add(e);
-//                    pathPane.add(e, maze.getX(), maze.getY());
-//                    e.setRotate(maze.getTurnList().get(maze.getTurnList().size() - 1) * 90);
+//                    pathPane.add(e, main.getX(), main.getY());
+//                    e.setRotate(main.getTurnList().get(main.getTurnList().size() - 1) * 90);
 //                } else {
 //                    pathPane.getChildren().remove(pathList.pop());
 //                }
@@ -109,8 +114,6 @@ public class MazePane extends StackPane {
     }
 
     private void paintMaze() {
-        mazeHeight = map.length;
-        mazeWidth = map[0].length;
         mainPane.getChildren().clear();
 
         for (int i = 0; i < mazeHeight; i++) {
@@ -186,7 +189,7 @@ public class MazePane extends StackPane {
             return OCC;
     }
 
-    public static double getBoxSize() {
+    public double getBoxSize() {
         return boxSize;
     }
 }

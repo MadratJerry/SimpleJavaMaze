@@ -43,7 +43,7 @@ public class Maze {
     };
 
     /**
-     * Initialize the size of maze.
+     * Initialize the size of main.
      * Initialize the begin and end Mouse for (0, 0)
      *
      * @param map
@@ -195,7 +195,7 @@ public class Maze {
                 map[i][j].setValue(value);
             }
             try {
-                Thread.currentThread().sleep(5);
+                Thread.currentThread().sleep(10);
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
@@ -249,7 +249,7 @@ public class Maze {
         return e.x >= 0 && e.x < map.length && e.y >= 0 && e.y < map[0].length;
     }
 
-    // test function
+    // load function
     private void showPath() {
         for (Stack<Integer> turnStack : pathList) {
             int x = begin.x;
