@@ -3,7 +3,6 @@ package pers.crazymouse.algorithm.visualizer;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.scene.paint.Paint;
 import pers.crazymouse.algorithm.std.Maze;
 
 /**
@@ -16,8 +15,8 @@ public class MazeElement extends ResizablePolygon {
     private int x;
     private int y;
 
-    Paint fill;
-    SimpleIntegerProperty type = new SimpleIntegerProperty();
+    int lastType = Integer.MIN_VALUE;
+    SimpleIntegerProperty type = new SimpleIntegerProperty(Integer.MIN_VALUE);
 
     public MazeElement(int index) {
         this(0, 0, index);
@@ -28,7 +27,6 @@ public class MazeElement extends ResizablePolygon {
         setY(y);
         type.addListener(new InvalidationListener() {
             @Override
-            // If the value is 0, it doesn't work.
             public void invalidated(Observable observable) {
                 convert(type.getValue());
             }
@@ -37,24 +35,35 @@ public class MazeElement extends ResizablePolygon {
     }
 
     private void convert(int index) {
-        getPoints().clear();
+        if (index == lastType)
+            return;
+        if ((lastType >= 0 && index < 0) || (lastType < 0 && index >= 0) || lastType == Integer.MIN_VALUE) {
+            getPoints().clear();
+            if (index >= 0) {
+                for (double i : squarePoints)
+                    getPoints().add(i);
+            } else {
+                for (double i : trianglePoints)
+                    getPoints().add(i);
+            }
+            resize();
+        }
         if (index == Maze.WALL) {
-            addPoints(squarePoints);
             setFill(MazePane.WALL);
         }
         if (index == Maze.BLANK) {
-            addPoints(squarePoints);
             setFill(MazePane.BLANK);
         }
         if (index == Maze.OCC) {
-            addPoints(squarePoints);
             setFill(MazePane.OCC);
         }
         if (index == Maze.DIREC) {
-            addPoints(trianglePoints);
             setFill(MazePane.DIREC);
         }
-        resize();
+        if (index == Maze.VISIT) {
+            setFill(MazePane.VISIT);
+        }
+        lastType = type.getValue();
     }
 
     private void addPoints(double[] points) {

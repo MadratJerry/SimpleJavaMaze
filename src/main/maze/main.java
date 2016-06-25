@@ -1,4 +1,4 @@
-package main;
+package main.maze;
 
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
@@ -9,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pers.crazymouse.algorithm.visualizer.MazePane;
 
@@ -18,40 +17,32 @@ import java.io.File;
 /**
  * Created by crazymouse on 6/19/16.
  */
-public class maze extends Application {
+public class main extends Application {
 
     public static void main(String[] args) {
         launch(args);
     }
 
     Text movedText = new Text("(0,0)");
+    File mazeFile;
+    MazePane mazePane;
+    int[][] map;
+
     @Override
     public void start(Stage primaryStage) {
+
         HBox pane = new HBox(10);
         pane.setAlignment(Pos.CENTER);
-        MazePane mazePane = new MazePane(new int[][]{
-                {0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
-                {0, 1, 0, 1, 1, 1, 0, 1, 0, 1},
-                {0, 0, 0, 1, 1, 0, 0, 1, 1, 1},
-                {0, 0, 0, 1, 0, 0, 1, 0, 0, 0},
-                {1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
-                {0, 0, 1, 1, 1, 0, 0, 1, 1, 1},
-                {0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}});
-        mazePane.setBegin(0, 0);
-        mazePane.setEnd(3, 2);
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+        mazePane = new MazePane(map);
+        mazePane.setBegin(1, 1);
+        mazePane.setEnd(199, 199);
 
         VBox btPane = new VBox(10);
         btPane.setAlignment(Pos.CENTER);
-        Button btFile = new Button("Maze file");
         Button btRun = new Button("Run!");
         Button btStep = new Button("One step");
         Button btBestPath = new Button("Show Current Best Path");
+        Button btGeneration = new Button("Generation");
         mazePane.movedXProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
@@ -64,15 +55,19 @@ public class maze extends Application {
                 movedText.setText(String.format("(%d,%d)", mazePane.getMovedX(), mazePane.getMovedY()));
             }
         });
-        btBestPath.disableProperty().bind(mazePane.getHasBestPath().not());
-        btFile.setOnAction(event -> fileChooser.showOpenDialog(primaryStage));
+        btBestPath.disableProperty().bind(mazePane.hasBestPathProperty().not());
         btStep.setOnAction(event -> mazePane.singleStep());
+        btStep.disableProperty().bind(mazePane.runningProperty());
         btRun.setOnAction(event -> mazePane.search());
-        btPane.getChildren().addAll(btFile, btRun, btStep, btBestPath, movedText);
+        btRun.disableProperty().bind(mazePane.runningProperty());
+        btGeneration.setOnAction(event -> mazePane.generation());
+        btGeneration.disableProperty().bind(mazePane.runningProperty());
+        btPane.getChildren().addAll(btGeneration, btRun, btStep, btBestPath, movedText);
 
         pane.getChildren().addAll(mazePane, btPane);
         primaryStage.setTitle("Maze pathfinding");
         primaryStage.setScene(new Scene(pane));
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 }
