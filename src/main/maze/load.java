@@ -15,7 +15,6 @@ import javafx.stage.Stage;
 import pers.crazymouse.algorithm.std.Maze;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -42,7 +41,8 @@ public class load extends Application {
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
-        Button btFile = new Button("Load main file");
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("TXT", "*.txt"));
+        Button btFile = new Button("Load maze file");
         Button btGeneration = new Button("Maze generation");
         btFile.setOnAction(event -> {
             mazeFile = fileChooser.showOpenDialog(loadStage);
@@ -115,7 +115,7 @@ public class load extends Application {
                 for (int j = 0; j < width; j++)
                     map[i][j] = mazeStirng.get(i).charAt(j) - '0';
             return true;
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             return false;
         }
     }

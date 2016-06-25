@@ -102,20 +102,7 @@ public class Maze {
     private void searchPath(Mouse begin, Mouse end) {
         setBegin(begin);
         setEnd(end);
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (singleStep()) {
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
-        });
-        thread.setPriority(1);
-        thread.start();
+        while (searchStep()) ;
     }
 
     public void setBegin(Mouse begin) {
@@ -162,7 +149,7 @@ public class Maze {
         return stack.peek().y;
     }
 
-    public boolean singleStep() {
+    public boolean searchStep() {
         if (!stack.empty()) {
             Mouse p = stack.peek();
             map[p.x][p.y].setValue(OCC);
@@ -194,36 +181,16 @@ public class Maze {
             for (int j = 0; j < map[i].length; j++) {
                 map[i][j].setValue(value);
             }
-            try {
-                Thread.currentThread().sleep(10);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
         }
     }
 
     public void generation() {
         setBegin(1, 1);
-
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                clearMapWithValue(WALL);
-                while (generationStep()) {
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-                setBegin(begin);
-            }
-        });
-        thread.setPriority(10);
-        thread.start();
+        clearMapWithValue(WALL);
+        while (generationStep()) ;
     }
 
-    private boolean generationStep() {
+    public boolean generationStep() {
         if (!stack.empty()) {
             Mouse p = stack.peek();
             map[p.x][p.y].setValue(VISIT);

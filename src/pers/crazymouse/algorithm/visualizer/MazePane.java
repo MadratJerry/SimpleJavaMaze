@@ -23,8 +23,10 @@ public class MazePane extends StackPane {
     static final Paint VISIT = Color.RED;
     private double boxSize;
 
+    private int beginX, beginY, endX, endY;
     private int mazeWidth, mazeHeight;
     private SimpleBooleanProperty hasBestPath = new SimpleBooleanProperty(false);
+    private SimpleBooleanProperty running = new SimpleBooleanProperty(false);
     SGridPane mainPane;
     SGridPane bestPathPane;
     SGridPane pathPane;
@@ -148,27 +150,80 @@ public class MazePane extends StackPane {
     }
 
     public void setBegin(int x, int y) {
-        maze.setBegin(x, y);
+        beginX = x;
+        beginY = y;
+        maze.setBegin(beginX, beginY);
     }
 
     public void setEnd(int x, int y) {
-        maze.setEnd(x, y);
+        endX = x;
+        endY = y;
+        maze.setEnd(endX, endY);
     }
 
     public boolean singleStep() {
-        return maze.singleStep();
+        return maze.searchStep();
     }
 
     public void generation() {
-        maze.generation();
+        setBegin(1, 1);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                running.setValue(true);
+                for (int i = 0; i < mazeHeight; i++) {
+                    for (int j = 0; j < mazeWidth; j++) {
+                        maze.getMap()[i][j].setValue(Maze.WALL);
+                        try {
+                            Thread.sleep(1);
+                        } catch (InterruptedException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+                while (maze.generationStep()) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                setBegin(beginX, beginY);
+                running.setValue(false);
+            }
+        });
+        thread.setPriority(10);
+        thread.start();
     }
 
     public void search() {
-        maze.searchPath();
+        setBegin(beginX, beginY);
+        setEnd(mazeHeight - 1, mazeWidth - 1);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                running.setValue(true);
+                while (maze.searchStep()) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                setBegin(beginX, beginY);
+                running.setValue(false);
+            }
+        });
+        thread.setPriority(10);
+        thread.start();
     }
 
-    public SimpleBooleanProperty getHasBestPath() {
+    public SimpleBooleanProperty hasBestPathProperty() {
         return hasBestPath;
+    }
+
+    public SimpleBooleanProperty runningProperty() {
+        return running;
     }
 
     public double getBoxSize() {

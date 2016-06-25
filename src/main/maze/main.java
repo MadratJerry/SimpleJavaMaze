@@ -55,10 +55,13 @@ public class main extends Application {
                 movedText.setText(String.format("(%d,%d)", mazePane.getMovedX(), mazePane.getMovedY()));
             }
         });
-        btBestPath.disableProperty().bind(mazePane.getHasBestPath().not());
+        btBestPath.disableProperty().bind(mazePane.hasBestPathProperty().not());
         btStep.setOnAction(event -> mazePane.singleStep());
+        btStep.disableProperty().bind(mazePane.runningProperty());
         btRun.setOnAction(event -> mazePane.search());
+        btRun.disableProperty().bind(mazePane.runningProperty());
         btGeneration.setOnAction(event -> mazePane.generation());
+        btGeneration.disableProperty().bind(mazePane.runningProperty());
         btPane.getChildren().addAll(btGeneration, btRun, btStep, btBestPath, movedText);
 
         pane.getChildren().addAll(mazePane, btPane);
