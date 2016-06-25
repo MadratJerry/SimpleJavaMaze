@@ -289,7 +289,7 @@ public class Maze {
                 if (turn.size() == 1) {
                     index = 0;
                 } else {
-                    index = new Random(System.currentTimeMillis()).nextInt(turn.size());
+                    index = new Random(System.currentTimeMillis() * x * y).nextInt(turn.size());
                 }
                 int t = turn.get(index);
                 e.x = x + ((t - 1) % 2) * d;

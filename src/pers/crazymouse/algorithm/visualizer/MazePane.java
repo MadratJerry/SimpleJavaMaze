@@ -40,32 +40,12 @@ public class MazePane extends StackPane {
         this.map = maze.getMap();
         mazeHeight = map.length;
         mazeWidth = map[0].length;
-        boxSize = Math.floor(Math.min(900 / mazeHeight, 1440 / mazeWidth)) - 1;
+        boxSize = (Math.min(900 / mazeHeight, 1440 / mazeWidth)) - 1.5;
         mainPane = new SGridPane(boxSize);
         bestPathPane = new SGridPane(boxSize);
         paintMaze();
         initPathPane();
         getChildren().addAll(mainPane);
-//        main.getTurnList().addListener(new InvalidationListener() {
-//            ObservableList<Integer> list = main.getTurnList();
-//            Stack<MazeElement> pathList = new Stack<>();
-//            int size = main.getTurnList().size();
-//            MazeElement e;
-//
-//            @Override
-//            public void invalidated(Observable observable) {
-//                System.out.println(pathList.size());
-//                if (list.size() > size) {
-//                    e = new MazeElement(Maze.DIREC);
-//                    pathList.add(e);
-//                    pathPane.add(e, main.getX(), main.getY());
-//                    e.setRotate(main.getTurnList().get(main.getTurnList().size() - 1) * 90);
-//                } else {
-//                    pathPane.getChildren().remove(pathList.pop());
-//                }
-//                size = list.size();
-//            }
-//        });
         maze.getPathList().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
@@ -171,14 +151,14 @@ public class MazePane extends StackPane {
             @Override
             public void run() {
                 running.setValue(true);
-                for (int i = 0; i < mazeHeight; i++) {
-                    for (int j = 0; j < mazeWidth; j++) {
+                for (int j = 0; j < mazeWidth; j++) {
+                    for (int i = 0; i < mazeHeight; i++) {
                         maze.getMap()[i][j].setValue(Maze.WALL);
-                        try {
-                            Thread.sleep(1);
-                        } catch (InterruptedException ex) {
-                            ex.printStackTrace();
-                        }
+                    }
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
                     }
                 }
                 while (maze.generationStep()) {

@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -41,15 +42,19 @@ public class load extends Application {
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("TXT", "*.txt"));
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Maze File(*.txt)", "*.txt"));
         Button btFile = new Button("Load maze file");
         Button btGeneration = new Button("Maze generation");
+        Text txWarnning = new Text();
         btFile.setOnAction(event -> {
             mazeFile = fileChooser.showOpenDialog(loadStage);
             if (loadMaze()) {
                 main.map = map;
                 main.start(new Stage());
                 loadStage.close();
+            } else {
+                txWarnning.setText("Not a standard maze file!");
+                txWarnning.setFill(Color.RED);
             }
         });
         btGeneration.setOnAction(event -> {
@@ -66,6 +71,7 @@ public class load extends Application {
             Button generation = new Button("Generation");
 
             pane.add(generation, 1, 2);
+            pane.add(txWarnning, 0, 2);
             GridPane.setHalignment(generation, HPos.RIGHT);
             generation.setOnAction(event1 -> {
                 Pattern pattern = Pattern.compile("^[0-9]{1,}$");
@@ -81,18 +87,24 @@ public class load extends Application {
                     for (int i = 0; i < width; i++) {
                         for (int j = 0; j < height; j++) {
                             map[i][j] = Maze.BLANK;
+                            if (i == 0 || j == 0 || i == width - 1 || j == height - 1)
+                                map[i][j] = Maze.WALL;
                         }
                     }
                     main.map = map;
                     main.start(new Stage());
                     loadStage.close();
+                } else {
+                    // TODO Not good enough
+                    txWarnning.setText("Input is NOT allowed!");
+                    txWarnning.setFill(Color.RED);
                 }
             });
             loadStage.setScene(new Scene(pane));
         });
-        loadPane.getChildren().addAll(btFile, btGeneration);
+        loadPane.getChildren().addAll(btFile, btGeneration, txWarnning);
 
-        loadStage.setScene(new Scene(loadPane));
+        loadStage.setScene(new Scene(loadPane, 200, 100));
         loadStage.show();
         loadStage.setResizable(false);
     }
