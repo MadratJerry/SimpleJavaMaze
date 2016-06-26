@@ -34,8 +34,6 @@ public class main extends Application {
         HBox pane = new HBox(10);
         pane.setAlignment(Pos.CENTER);
         mazePane = new MazePane(map);
-        mazePane.setBegin(1, 1);
-        mazePane.setEnd(9, 9);
 
         VBox btPane = new VBox(10);
         btPane.setAlignment(Pos.CENTER);

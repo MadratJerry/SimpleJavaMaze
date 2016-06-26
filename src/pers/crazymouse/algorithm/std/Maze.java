@@ -120,6 +120,7 @@ public class Maze {
 
     public void setEnd(int x, int y) {
         this.end = new Mouse(x, y);
+        init();
     }
 
     private void init() {
