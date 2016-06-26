@@ -41,6 +41,7 @@ public class main extends Application {
         Button btStep = new Button("One step");
         Button btBestPath = new Button("Show Current Best Path");
         Button btGeneration = new Button("Generation");
+        Button btStop = new Button("Stop");
         mazePane.movedXProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
@@ -59,9 +60,11 @@ public class main extends Application {
         btStep.disableProperty().bind(mazePane.runningProperty());
         btRun.setOnAction(event -> mazePane.search());
         btRun.disableProperty().bind(mazePane.runningProperty());
+        btStop.setOnAction(event -> mazePane.setStop(true));
+        btStop.disableProperty().bind(mazePane.runningProperty().not());
         btGeneration.setOnAction(event -> mazePane.generation());
         btGeneration.disableProperty().bind(mazePane.runningProperty());
-        btPane.getChildren().addAll(btGeneration, btRun, btStep, btBestPath, movedText);
+        btPane.getChildren().addAll(btGeneration, btRun, btStop, btStep, btBestPath, movedText);
 
         pane.getChildren().addAll(mazePane, btPane);
         primaryStage.setTitle("Maze pathfinding");

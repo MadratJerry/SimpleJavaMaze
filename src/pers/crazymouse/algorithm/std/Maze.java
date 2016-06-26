@@ -1,6 +1,7 @@
 package pers.crazymouse.algorithm.std;
 
 import com.sun.javafx.collections.TrackableObservableList;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -26,19 +27,19 @@ public class Maze {
     private Mouse begin;
     private Mouse end;
     private volatile Stack<Mouse> stack = new Stack<>();
+    private SimpleBooleanProperty hasBestPath = new SimpleBooleanProperty(false);
     private ObservableList<Integer> turnList = new TrackableObservableList<Integer>() {
         @Override
         protected void onChanged(ListChangeListener.Change<Integer> c) {
 
         }
     };
+    private Stack<Integer> bestTurnList = new Stack<>();
 
     private int bestPathLength = Integer.MAX_VALUE;
     private ObservableList<Stack<Integer>> pathList = new TrackableObservableList<Stack<Integer>>() {
         @Override
         protected void onChanged(ListChangeListener.Change<Stack<Integer>> c) {
-            if (turnList.size() < bestPathLength)
-                bestPathLength = turnList.size();
         }
     };
 
@@ -81,8 +82,8 @@ public class Maze {
         searchPath(begin, end);
     }
 
-    public int getBestPathLength() {
-        return bestPathLength;
+    public SimpleBooleanProperty hasBestPathProperty() {
+        return hasBestPath;
     }
 
     public int getValue(int x, int y) {
@@ -130,8 +131,11 @@ public class Maze {
                     map[i][j].setValue(BLANK);
             }
         }
+        pathList.clear();
+        turnList.clear();
         stack.clear();
         stack.add(begin);
+        bestPathLength = Integer.MAX_VALUE;
     }
 
     public ObservableList<Stack<Integer>> getPathList() {
@@ -160,6 +164,13 @@ public class Maze {
                 for (int i : turnList)
                     turnStack.add(i);
                 pathList.add((Stack<Integer>) turnStack.clone());
+                if (turnStack.size() < bestPathLength) {
+                    hasBestPath.setValue(true);
+                    bestPathLength = turnStack.size();
+                    synchronized (bestTurnList) {
+                        bestTurnList = pathList.get(pathList.size() - 1);
+                    }
+                }
             }
             if (!p.hasChoice()) {
                 map[p.x][p.y].setValue(BLANK);
@@ -175,6 +186,14 @@ public class Maze {
             }
         }
         return !stack.empty();
+    }
+
+    public Stack<Integer> getBestTurnList() {
+        return bestTurnList;
+    }
+
+    public int getBestPathLength() {
+        return bestPathLength;
     }
 
     public void clearMapWithValue(int value) {
