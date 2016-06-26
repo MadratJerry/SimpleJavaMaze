@@ -1,7 +1,6 @@
 package pers.crazymouse.algorithm.std;
 
 import com.sun.javafx.collections.TrackableObservableList;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -27,7 +26,6 @@ public class Maze {
     private Mouse begin;
     private Mouse end;
     private volatile Stack<Mouse> stack = new Stack<>();
-    private SimpleBooleanProperty hasBestPath = new SimpleBooleanProperty(false);
     private ObservableList<Integer> turnList = new TrackableObservableList<Integer>() {
         @Override
         protected void onChanged(ListChangeListener.Change<Integer> c) {
@@ -82,10 +80,6 @@ public class Maze {
         searchPath(begin, end);
     }
 
-    public SimpleBooleanProperty hasBestPathProperty() {
-        return hasBestPath;
-    }
-
     public int getValue(int x, int y) {
         try {
             return map[x][y].getValue();
@@ -131,11 +125,11 @@ public class Maze {
                     map[i][j].setValue(BLANK);
             }
         }
+        bestPathLength = Integer.MAX_VALUE;
         pathList.clear();
         turnList.clear();
         stack.clear();
         stack.add(begin);
-        bestPathLength = Integer.MAX_VALUE;
     }
 
     public ObservableList<Stack<Integer>> getPathList() {
@@ -163,14 +157,13 @@ public class Maze {
                 Stack<Integer> turnStack = new Stack<>();
                 for (int i : turnList)
                     turnStack.add(i);
-                pathList.add((Stack<Integer>) turnStack.clone());
                 if (turnStack.size() < bestPathLength) {
-                    hasBestPath.setValue(true);
                     bestPathLength = turnStack.size();
                     synchronized (bestTurnList) {
-                        bestTurnList = pathList.get(pathList.size() - 1);
+                        bestTurnList = (Stack<Integer>) turnStack.clone();
                     }
                 }
+                pathList.add((Stack<Integer>) turnStack.clone());
             }
             if (!p.hasChoice()) {
                 map[p.x][p.y].setValue(BLANK);
@@ -218,6 +211,7 @@ public class Maze {
                 map[p.x][p.y].set(BLANK);
                 stack.pop();
             } else {
+
                 Mouse np = p.Turn(2);
                 if (getValue(np) != VISIT && getValue(np) != BLANK && isVaild(np)) {
                     int t = 6;
@@ -228,6 +222,7 @@ public class Maze {
                     map[x][y].setValue(BLANK);
                     stack.add(np);
                 }
+
             }
         }
         return !stack.empty();

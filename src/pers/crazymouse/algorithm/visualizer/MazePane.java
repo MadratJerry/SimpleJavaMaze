@@ -12,6 +12,7 @@ import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 import pers.crazymouse.algorithm.std.Maze;
 
+import java.util.Random;
 import java.util.Stack;
 
 /**
@@ -228,7 +229,9 @@ public class MazePane extends StackPane {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                maze.setBegin(1, 1);
+                int x = new Random(System.currentTimeMillis()).nextInt(mazeHeight - 4);
+                int y = new Random(System.currentTimeMillis()).nextInt(mazeWidth - 4);
+                maze.setBegin(x + x % 2 + 1, y + x % 2 + 1);
                 running.setValue(true);
                 for (int j = 0; j < mazeWidth; j++) {
                     for (int i = 0; i < mazeHeight; i++) {
