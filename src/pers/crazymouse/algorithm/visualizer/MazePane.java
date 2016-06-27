@@ -35,6 +35,7 @@ public class MazePane extends StackPane {
     private SimpleBooleanProperty hasBestPath = new SimpleBooleanProperty(false);
     private SimpleBooleanProperty running = new SimpleBooleanProperty(false);
     private SimpleBooleanProperty stop = new SimpleBooleanProperty(false);
+    private SimpleBooleanProperty animation = new SimpleBooleanProperty(true);
     SGridPane mainPane;
     SGridPane bestPathPane;
     SGridPane pathPane;
@@ -203,6 +204,10 @@ public class MazePane extends StackPane {
         return movedY;
     }
 
+    public SimpleBooleanProperty animationProperty() {
+        return animation;
+    }
+
     public void setBegin(int x, int y) {
         beginX = x;
         beginY = y;
@@ -260,7 +265,15 @@ public class MazePane extends StackPane {
             }
         });
         thread.setPriority(10);
-        thread.start();
+        if (animationProperty().getValue()) {
+            thread.start();
+        } else {
+            running.setValue(true);
+            maze.generation();
+            setBegin(1, 1);
+            setEnd(mazeHeight - 2, mazeWidth - 2);
+            running.setValue(false);
+        }
     }
 
     public void search() {
@@ -288,7 +301,13 @@ public class MazePane extends StackPane {
             }
         });
         thread.setPriority(10);
-        thread.start();
+        if (animationProperty().getValue()) {
+            thread.start();
+        } else {
+            running.setValue(true);
+            while (maze.searchStep()) ;
+            running.setValue(false);
+        }
     }
 
     public void showBestPath() {
