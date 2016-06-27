@@ -7,8 +7,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import pers.crazymouse.algorithm.visualizer.MazePane;
@@ -44,6 +47,7 @@ public class main extends Application {
         Button btBestPath = new Button("Show Current Best Path");
         Button btGeneration = new Button("Generation");
         Button btStop = new Button("Stop");
+        Slider sSpeed = new Slider();
         mazePane.movedXProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
@@ -69,9 +73,19 @@ public class main extends Application {
         btStop.disableProperty().bind(mazePane.runningProperty().not());
         btGeneration.setOnAction(event -> mazePane.generation());
         btGeneration.disableProperty().bind(mazePane.runningProperty());
-        btPane.getChildren().addAll(cbAnimation, btGeneration, btRun, btStop, btStep, btBestPath, movedText);
+        mazePane.speedProperty().bind(sSpeed.valueProperty());
+        sSpeed.setShowTickLabels(true);
+        sSpeed.setShowTickMarks(true);
+        sSpeed.setMin(1);
+        sSpeed.setMax(100);
+        btPane.getChildren().addAll(cbAnimation, btGeneration, btRun, btStop, btStep, btBestPath, sSpeed, movedText);
 
-        pane.getChildren().addAll(mazePane, btPane);
+
+        ListView<HBox> lvPath = new ListView();
+        HBox a = new HBox();
+        a.getChildren().addAll(new Line(0, 1, 100, 1), new Text("1111"));
+        lvPath.getItems().addAll(a);
+        pane.getChildren().addAll(mazePane, btPane, lvPath);
         primaryStage.setTitle("Maze pathfinding");
         primaryStage.setScene(new Scene(pane));
         primaryStage.setResizable(false);

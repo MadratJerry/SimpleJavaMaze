@@ -45,6 +45,7 @@ public class MazePane extends StackPane {
     FillTransition ftMap[][];
     SimpleIntegerProperty movedX = new SimpleIntegerProperty(0);
     SimpleIntegerProperty movedY = new SimpleIntegerProperty(0);
+    SimpleIntegerProperty speed = new SimpleIntegerProperty(1);
     Maze maze;
 
     public MazePane(int[][] map) {
@@ -254,7 +255,7 @@ public class MazePane extends StackPane {
                         break;
                     }
                     try {
-                        Thread.sleep(1);
+                        Thread.sleep(speedProperty().getValue());
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
@@ -286,7 +287,7 @@ public class MazePane extends StackPane {
 //                maze.getTurnList().clear();
                 try {
                     while (maze.searchStep()) {
-                        Thread.sleep(1);
+                        Thread.sleep(speedProperty().getValue());
                         if (stop.getValue() == true) {
                             stop.setValue(false);
                             break;
@@ -342,6 +343,10 @@ public class MazePane extends StackPane {
 
     public SimpleBooleanProperty runningProperty() {
         return running;
+    }
+
+    public SimpleIntegerProperty speedProperty() {
+        return speed;
     }
 
     public void setStop(boolean stop) {
