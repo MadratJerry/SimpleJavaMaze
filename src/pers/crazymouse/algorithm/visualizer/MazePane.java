@@ -5,6 +5,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.ObservableList;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -23,7 +24,7 @@ public class MazePane extends StackPane {
     static final Paint BLANK = Color.TRANSPARENT;
     static final Paint OCC = Color.GREY;
     static final Paint DIREC = Color.GREEN;
-    static final Paint BEST = Color.RED;
+    static final Paint BEST = Color.PINK;
     static final Paint VISIT = Color.RED;
     static final Paint BEGIN = Color.RED;
     static final Paint END = Color.YELLOW;
@@ -312,11 +313,11 @@ public class MazePane extends StackPane {
     }
 
     public void showBestPath() {
-        showPath(maze.getBestTurnList());
+        showPath(maze.getBestTurnList(), BEST);
         hasBestPath.setValue(false);
     }
 
-    public void showPath(Stack<Integer> bestTurnStack) {
+    public void showPath(Stack<Integer> bestTurnStack, Paint fill) {
         pathPane.setVisible(true);
         for (int i = 0; i < mazeHeight; i++) {
             for (int j = 0; j < mazeWidth; j++) {
@@ -334,6 +335,7 @@ public class MazePane extends StackPane {
             if (pathMap[x][y].getType() != Maze.DIREC)
                 pathMap[x][y].setType(Maze.DIREC);
             pathMap[x][y].setRotate(bestTurnStack.get(i) * 90);
+            pathMap[x][y].setFill(fill);
         }
     }
 
@@ -347,6 +349,10 @@ public class MazePane extends StackPane {
 
     public SimpleIntegerProperty speedProperty() {
         return speed;
+    }
+
+    public ObservableList<Stack<Integer>> getPathList() {
+        return maze.getPathList();
     }
 
     public void setStop(boolean stop) {

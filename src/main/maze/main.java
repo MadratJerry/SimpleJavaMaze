@@ -3,6 +3,8 @@ package main.maze;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -11,12 +13,17 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import pers.crazymouse.algorithm.visualizer.MazePane;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Stack;
 
 /**
  * Created by crazymouse on 6/19/16.
@@ -30,6 +37,9 @@ public class main extends Application {
     Text movedText = new Text("(0,0)");
     File mazeFile;
     MazePane mazePane;
+    ObservableList<Stack<Integer>> pathList;
+    ObservableList<HBox> items = FXCollections.observableArrayList();
+    ArrayList<ObservableList<Stack<Integer>>> arraySortPathList = new ArrayList<>();
     int[][] map;
 
     @Override
@@ -81,10 +91,59 @@ public class main extends Application {
         btPane.getChildren().addAll(cbAnimation, btGeneration, btRun, btStop, btStep, btBestPath, sSpeed, movedText);
 
 
-        ListView<HBox> lvPath = new ListView();
-        HBox a = new HBox();
-        a.getChildren().addAll(new Line(0, 1, 100, 1), new Text("1111"));
-        lvPath.getItems().addAll(a);
+        pathList = mazePane.getPathList();
+        pathList.addListener(new InvalidationListener() {
+            HBox newBox;
+            Paint lineColor;
+            Line colorLine;
+            Text txLength;
+
+            @Override
+            public void invalidated(Observable observable) {
+                try {
+                    if (pathList.size() == 0) {
+                        items.clear();
+                        arraySortPathList.clear();
+                        return;
+                    }
+                    newBox = new HBox(10);
+                    colorLine = new Line(0, 3, 100, 3);
+                    colorLine.setStrokeWidth(3);
+                    long feed = System.currentTimeMillis();
+                    lineColor = Color.color(new Random(feed * 1).nextDouble(),
+                            new Random(feed * 2).nextDouble(),
+                            new Random(feed * 3).nextDouble());
+                    colorLine.setStroke(lineColor);
+                    txLength = new Text("Step: " +
+                            pathList.get(pathList.size() - 1).size() + "");
+                    // Just save the num...
+                    txLength.setId(pathList.size() - 1 + "");
+                    txLength.setLineSpacing(pathList.get(pathList.size() - 1).size());
+                    arraySortPathList.add(pathList);
+                    newBox.getChildren().addAll(colorLine, txLength);
+                    if (items.size() == 0)
+                        items.add(newBox);
+                    else {
+                        for (int i = 0, size; i < items.size(); i++) {
+                            size = (int) ((Text) items.get(i).getChildren().get(1)).getLineSpacing();
+                            if (pathList.get(pathList.size() - 1).size() > size) {
+                                items.add(i + 1, newBox);
+                                break;
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.getMessage();
+                }
+            }
+        });
+        ListView<HBox> lvPath = new ListView(items);
+        lvPath.setOnMouseClicked(event -> {
+            int num = Integer.parseInt(
+                    lvPath.getSelectionModel().getSelectedItem().getChildren().get(1).getId());
+            Paint color = ((Line) lvPath.getSelectionModel().getSelectedItem().getChildren().get(0)).getStroke();
+            mazePane.showPath(pathList.get(num), color);
+        });
         pane.getChildren().addAll(mazePane, btPane, lvPath);
         primaryStage.setTitle("Maze pathfinding");
         primaryStage.setScene(new Scene(pane));
