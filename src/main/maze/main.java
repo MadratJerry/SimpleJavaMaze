@@ -17,10 +17,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pers.crazymouse.algorithm.visualizer.MazePane;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Stack;
@@ -52,11 +55,13 @@ public class main extends Application {
         VBox btPane = new VBox(10);
         btPane.setAlignment(Pos.CENTER);
         CheckBox cbAnimation = new CheckBox("Animation");
+        CheckBox cbFeature = new CheckBox("Feature");
         Button btRun = new Button("Run!");
         Button btStep = new Button("One step");
         Button btBestPath = new Button("Show Current Best Path");
         Button btGeneration = new Button("Generation");
         Button btStop = new Button("Stop");
+        Button btSave = new Button("Save");
         Slider sSpeed = new Slider();
         mazePane.movedXProperty().addListener(new InvalidationListener() {
             @Override
@@ -70,9 +75,14 @@ public class main extends Application {
                 movedText.setText(String.format("(%d,%d)", mazePane.getMovedX(), mazePane.getMovedY()));
             }
         });
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
         mazePane.animationProperty().bind(cbAnimation.selectedProperty());
+        mazePane.featuresProperty().bind(cbFeature.selectedProperty());
         cbAnimation.disableProperty().bind(mazePane.runningProperty());
         cbAnimation.setSelected(true);
+        cbFeature.setSelected(true);
         btBestPath.disableProperty().bind(mazePane.hasBestPathProperty().not());
         btBestPath.setOnAction(event -> mazePane.showBestPath());
         btStep.setOnAction(event -> mazePane.singleStep());
@@ -83,12 +93,16 @@ public class main extends Application {
         btStop.disableProperty().bind(mazePane.runningProperty().not());
         btGeneration.setOnAction(event -> mazePane.generation());
         btGeneration.disableProperty().bind(mazePane.runningProperty());
+        btSave.setOnAction(event -> {
+            mazeFile = fileChooser.showSaveDialog(primaryStage);
+            saveMaze();
+        });
         mazePane.speedProperty().bind(sSpeed.valueProperty());
         sSpeed.setShowTickLabels(true);
         sSpeed.setShowTickMarks(true);
         sSpeed.setMin(1);
         sSpeed.setMax(100);
-        btPane.getChildren().addAll(cbAnimation, btGeneration, btRun, btStop, btStep, btBestPath, sSpeed, movedText);
+        btPane.getChildren().addAll(cbFeature, cbAnimation, btGeneration, btSave, btRun, btStop, btStep, btBestPath, sSpeed, movedText);
 
 
         pathList = mazePane.getPathList();
@@ -149,5 +163,18 @@ public class main extends Application {
         primaryStage.setScene(new Scene(pane));
         primaryStage.setResizable(false);
         primaryStage.show();
+    }
+
+    public void saveMaze() {
+        try (PrintWriter output = new PrintWriter(mazeFile)) {
+            for (int i = 0; i < mazePane.getMap().length; i++) {
+                for (int j = 0; j < mazePane.getMap()[i].length; j++) {
+                    output.print(mazePane.getMap()[i][j].getValue());
+                }
+                output.println();
+            }
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
     }
 }

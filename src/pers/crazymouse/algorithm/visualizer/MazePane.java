@@ -37,6 +37,7 @@ public class MazePane extends StackPane {
     private SimpleBooleanProperty running = new SimpleBooleanProperty(false);
     private SimpleBooleanProperty stop = new SimpleBooleanProperty(false);
     private SimpleBooleanProperty animation = new SimpleBooleanProperty(true);
+    private SimpleBooleanProperty features = new SimpleBooleanProperty(false);
     SGridPane mainPane;
     SGridPane bestPathPane;
     SGridPane pathPane;
@@ -81,15 +82,15 @@ public class MazePane extends StackPane {
             for (int j = 0; j < mazeWidth; j++) {
                 MazeElement element = new MazeElement(i, j, Maze.BLANK);
                 pathMap[i][j] = element;
-                element.setOnMouseEntered(event -> {
-                    pathPane.setMouseTransparent(true);
-                    movedX.setValue(element.getX());
-                    movedY.setValue(element.getY());
-                });
-                element.setOnMouseExited(event -> pathPane.setMouseTransparent(false));
+//                element.setOnMouseEntered(event -> {
+//                    movedX.setValue(element.getX());
+//                    movedY.setValue(element.getY());
+//                });
+//                element.setOnMouseExited(event -> pathPane.setMouseTransparent(false));
                 pathPane.add(element, i, j);
             }
         }
+        pathPane.setMouseTransparent(true);
     }
 
     private void sleep(long time) {
@@ -132,13 +133,22 @@ public class MazePane extends StackPane {
                 ft.setCycleCount(2);
                 ft.setAutoReverse(true);
                 element.setOnMouseEntered(event -> {
+                    mainPane.requestFocus();
                     movedX.setValue(element.getX());
                     movedY.setValue(element.getY());
+                    if (features.getValue() == true) {
                     ft.play();
                     ft.jumpTo(Duration.millis(1000));
-                    ft.pause();
+                        ft.pause();
+                    }
                 });
-                element.setOnMouseExited(event -> ft.play());
+                element.setOnMouseExited(event -> {
+                    if (features.getValue() == true) {
+                        ft.play();
+                    }
+                });
+                element.setOnMouseClicked(event -> {
+                });
 
                 setAnimation(element);
                 mainPane.add(element, i, j);
@@ -160,6 +170,19 @@ public class MazePane extends StackPane {
                 setEnd(endX, endY);
             }
         });
+        mainPane.setOnKeyTyped(event -> {
+            System.out.println("!!!!");
+            if (map[movedX.getValue()][movedY.getValue()].getValue() == Maze.WALL)
+                map[movedX.getValue()][movedY.getValue()].setValue(Maze.BLANK);
+            else if (map[movedX.getValue()][movedY.getValue()].getValue() == Maze.BLANK)
+                map[movedX.getValue()][movedY.getValue()].setValue(Maze.WALL);
+            ftMap[movedX.getValue()][movedY.getValue()].jumpTo(Duration.millis(1000));
+            ftMap[movedX.getValue()][movedY.getValue()].pause();
+        });
+    }
+
+    public SimpleBooleanProperty featuresProperty() {
+        return features;
     }
 
     private void cleanPathMap() {
