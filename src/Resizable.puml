@@ -1,0 +1,76 @@
+@startuml
+interface Resizable {
+
+    void resizeWithRate(double rate);
+
+    boolean isResizable();
+
+    void resize(double width, double height);
+
+    DoubleProperty getResizableWidth();
+
+    DoubleProperty getResizableHeight();
+}
+class ResizablePolygon extends Polygon implements Resizable {
+    private double currentWidth;
+    private double currentHeight;
+
+    DoubleProperty resizableWidth;
+    DoubleProperty resizableHeight;
+
+    public ResizablePolygon() {};
+
+    public void resize() {};
+    public void resize(double width, double height) {}
+
+    public void resizeWithRate(double rate) {}
+
+    public void resizeWithRate(double zoomWidthRate, double zoomHeightRate) {}
+
+    double boundedSize(double value, double min, double max) {}
+
+    public void computeSize() {}
+
+    public boolean isResizable() {}
+    public DoubleProperty getResizableWidth() {}
+    public DoubleProperty getResizableHeight() {}
+}
+class MazeElement extends ResizablePolygon {
+    private double[] squarePoints;
+    private double[] trianglePoints;
+    private double[] arrowPoints;
+    private double[] beginPoints;
+    private double[] endPoints;
+    private int x;
+    private int y;
+    int lastType = Integer.MIN_VALUE;
+    SimpleIntegerProperty type = new SimpleIntegerProperty(Integer.MIN_VALUE);
+    public MazeElement(int index) {}
+    public MazeElement(int x, int y, int index) {}
+    private void convert(int index) {}
+    private void addPoints(double[] points) {}
+    public void setType(int index) {}
+    public int getType() {}
+    public int getX() {}
+    public void setX(int x) {}
+    public int getY() {}
+    public void setY(int y) {}
+    public SimpleIntegerProperty typeProperty() {}
+}
+
+class Square extends Rectangle implements Resizable {
+    public Square() {}
+    public Square(double length) {}
+    public Square(Paint color) {}
+    public Square(double length, Paint fill) {}
+    public Square(double x, double y, double length) {}
+    public void resize(double width, double height) {}
+    public void resizeWithRate(double rate) {}
+    public boolean isResizable() {}
+    public final void setLength(double length) {}
+    public double getLength() {}
+    public DoubleProperty getResizableHeight() {}
+    public DoubleProperty getResizableWidth() {}
+}
+
+@enduml

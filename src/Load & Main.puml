@@ -1,0 +1,33 @@
+@startuml
+class load extends Application {
+
+    public static void main(String[] args) {}
+
+    File mazeFile;
+    int[][] map;
+
+    public void start(Stage primaryStage) {}
+    public boolean loadMaze() {}
+
+
+}
+
+class main extends Application {
+
+    public static void main(String[] args) {}
+
+    Text movedText;
+    File mazeFile;
+    MazePane mazePane;
+    ObservableList<Stack<Integer>> pathList;
+    ObservableList<HBox> items;
+    ArrayList<ObservableList<Stack<Integer>>> arraySortPathList;
+    int[][] map;
+
+    public void start(Stage primaryStage) {}
+
+    public void saveMaze() {}
+}
+
+
+@enduml

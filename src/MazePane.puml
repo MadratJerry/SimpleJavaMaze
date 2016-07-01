@@ -1,0 +1,87 @@
+@startuml
+class MazePane extends StackPane {
+    static final Paint WALL = Color.BLACK;
+    static final Paint BLANK = Color.TRANSPARENT;
+    static final Paint OCC = Color.GREY;
+    static final Paint DIREC = Color.GREEN;
+    static final Paint BEST = Color.PINK;
+    static final Paint VISIT = Color.RED;
+    static final Paint BEGIN = Color.RED;
+    static final Paint END = Color.YELLOW;
+    private double boxSize;
+
+    private int beginX, beginY, endX, endY;
+    private int mazeWidth, mazeHeight;
+    private int bestPathLength = Integer.MAX_VALUE;
+    private SimpleBooleanProperty hasBestPath;
+    private SimpleBooleanProperty running;
+    private SimpleBooleanProperty stop;
+    private SimpleBooleanProperty animation;
+    private SimpleBooleanProperty features;
+    SGridPane mainPane;
+    SGridPane bestPathPane;
+    SGridPane pathPane;
+    SimpleIntegerProperty map[][];
+    MazeElement pathMap[][];
+    MazeElement mazeMap[][];
+    FillTransition ftMap[][];
+    SimpleIntegerProperty movedX;
+    SimpleIntegerProperty movedY;
+    SimpleIntegerProperty speed;
+    Maze maze;
+
+    public MazePane(int[][] map) {}
+
+    private void initPathPane() {}
+
+    private void sleep(long time) {}
+
+    public SimpleIntegerProperty[][] getMap() {}
+
+    int X, Y;
+
+    private void paintMaze() {}
+
+    public SimpleBooleanProperty featuresProperty() {}
+
+    private void cleanPathMap() {}
+
+    private void setAnimation(MazeElement element) {}
+
+    public int getMovedX() {}
+
+    public SimpleIntegerProperty movedXProperty() {}
+
+    public int getMovedY() {}
+
+    public SimpleIntegerProperty movedYProperty() {}
+
+    public SimpleBooleanProperty animationProperty() {}
+
+    public void setBegin(int x, int y) {}
+
+    public void setEnd(int x, int y) {}
+
+    public boolean singleStep() {}
+
+    public void generation() {}
+
+    public void search() {}
+
+    public void showBestPath() {}
+
+    public void showPath(Stack<Integer> bestTurnStack, Paint fill) {}
+
+    public SimpleBooleanProperty hasBestPathProperty() {}
+
+    public SimpleBooleanProperty runningProperty() {}
+
+    public SimpleIntegerProperty speedProperty() {}
+
+    public ObservableList<Stack<Integer>> getPathList() {}
+
+    public void setStop(boolean stop) {}
+
+    public double getBoxSize() {}
+}
+@enduml

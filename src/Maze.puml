@@ -1,0 +1,99 @@
+@startuml
+
+
+class Maze {
+    public static final int BLANK = 0;
+    public static final int WALL = BLANK + 1;
+    public static final int OCC = 2;
+    public static final int VISIT = 3;
+    public static final int DIREC = -1;
+
+    private int width;
+    private int height;
+
+    private int lastTurn;
+    private SimpleIntegerProperty map[][];
+    private Mouse begin;
+    private Mouse end;
+    private volatile Stack<Mouse> stack;
+    private ObservableList<Integer> turnList;
+    private Stack<Integer> bestTurnList;
+
+    private int bestPathLength = Integer.MAX_VALUE;
+    private ObservableList<Stack<Integer>> pathList;
+
+    public Maze(int[][] map) {}
+
+    private void setMap(int[][] map) {}
+
+    public void setMap(SimpleIntegerProperty[][] map) {}
+
+    public SimpleIntegerProperty[][] getMap() {}
+
+    public void searchPath(int beginX, int beginY, int endX, int endY) {}
+
+    public void searchPath() {}
+
+    public int getValue(int x, int y) {}
+
+    public int getValue(Mouse e) {}
+
+    private void searchPath(Mouse begin, Mouse end) {}
+
+    public void setBegin(Mouse begin) {}
+
+    public void setBegin(int x, int y) {}
+
+    public void setEnd(Mouse end) {}
+
+    public void setEnd(int x, int y) {}
+
+    private void init() {}
+
+    public ObservableList<Stack<Integer>> getPathList() {}
+
+    public ObservableList<Integer> getTurnList() {}
+
+    public int getX() {}
+
+    public int getY() {}
+
+    public boolean searchStep() {}
+
+    public Stack<Integer> getBestTurnList() {}
+
+    public int getBestPathLength() {}
+
+    public void clearMapWithValue(int value) {}
+
+    public void generation() {}
+
+    public boolean generationStep() {}
+
+    private boolean isVaild(Mouse e) {}
+
+    private void showPath() {}
+
+
+}
+
+class Mouse implements Comparable {
+            int x;
+            int y;
+            Stack<Integer> turn;
+
+            Mouse() {}
+
+            Mouse(int x, int y) {}
+
+            public String toString() {}
+
+            public int compareTo(Mouse o) {}
+
+            public boolean equals(Object obj) {}
+
+            boolean hasChoice() {}
+
+            Mouse Turn(int d) {}
+        }
+@enduml

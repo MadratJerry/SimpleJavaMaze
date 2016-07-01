@@ -1,0 +1,108 @@
+@startuml
+[*] --> LoadPane : Initialize the interface
+state LoadPane {
+    state LoadFile {
+        LoadFile --> FileOpenChooser
+    }
+
+    state GenerationPane {
+        GenerationPane --> InputPane
+    }
+}
+
+state MainPane {
+    state MazeMap {
+        InputPane --> MazeMap : Input the width and height of the maze
+        FileOpenChooser --> MazeMap : Read the file into array
+        MazeMap --> Agent : 01 map
+    }
+    state MazePane {
+        state main {
+            main --> modifier : Modify map
+            main --> Agent : Set begin & end
+        }
+        state path {
+        }
+        state Agent {
+            Agent --> map
+            Agent --> FileSaveChooser : Save
+            Agent --> main : Feature & Animation
+            Agent --> Thread : OneStep && Generation
+            Agent --> Thread : Run && Stop
+            Agent --> Thread : Speed
+            Agent --> path : Best Path && ListView
+            Agent --> modifier : begin & end
+            state Thread {
+                Thread --> searchStep : One Step
+                Thread --> generationStep : Generation
+            }
+        }
+    }
+    state FunctionPane {
+        state Feature {
+            Feature --> Sender
+        }
+        state Animation {
+            Animation  --> Sender
+        }
+        state Generation {
+            Generation  --> Sender
+        }
+        state Save {
+            Save  --> Sender
+        }
+        state Run {
+            Run  --> Sender
+        }
+        state Stop {
+            Stop  --> Sender
+        }
+        state OneStep {
+            OneStep  --> Sender
+        }
+        state BestPath{
+            BestPath  --> Sender
+        }
+        state SpeedSlide {
+            SpeedSlide  --> Sender
+        }
+        state PathListView {
+            PathListView --> Sender
+        }
+        state Sender {
+        }
+        Sender --> Agent : Operational information
+    }
+}
+state Maze {
+    state map {
+        map --> main : bind
+    }
+    state searchStep {
+        searchStep --> map : change
+        searchStep --> pathList : add
+        searchStep --> init : clean
+    }
+    state modifier {
+        modifier --> map : change
+        modifier --> init : begin & end
+    }
+    state pathList {
+        pathList --> path : bind
+    }
+    state turnList {
+        turnList --> path : bind
+    }
+    state init {
+        init --> pathList : clean
+        init --> turnList : clean
+    }
+    state generationStep {
+        generationStep --> map : change
+        generationStep --> init : clean
+    }
+}
+state FileSaveChooser {
+}
+FileSaveChooser --> [*] : Saved
+@enduml
