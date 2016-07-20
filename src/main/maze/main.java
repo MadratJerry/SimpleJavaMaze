@@ -7,11 +7,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import pers.crazymouse.algorithm.visualizer.MazePane;
@@ -23,14 +21,14 @@ import java.io.File;
  */
 public class main extends Application {
 
-    public static void main(String[] args) {
-        launch(args);
-    }
-
     Text movedText = new Text("(0,0)");
     File mazeFile;
     MazePane mazePane;
     int[][] map;
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -79,13 +77,8 @@ public class main extends Application {
         sSpeed.setMin(1);
         sSpeed.setMax(100);
         btPane.getChildren().addAll(cbAnimation, btGeneration, btRun, btStop, btStep, btBestPath, sSpeed, movedText);
+        pane.getChildren().addAll(mazePane, btPane);
 
-
-        ListView<HBox> lvPath = new ListView();
-        HBox a = new HBox();
-        a.getChildren().addAll(new Line(0, 1, 100, 1), new Text("1111"));
-        lvPath.getItems().addAll(a);
-        pane.getChildren().addAll(mazePane, btPane, lvPath);
         primaryStage.setTitle("Maze pathfinding");
         primaryStage.setScene(new Scene(pane));
         primaryStage.setResizable(false);
