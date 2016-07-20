@@ -68,7 +68,7 @@ public class load extends Application {
             TextField textFieldWidth = new TextField();
             TextField textFieldHeight = new TextField();
             pane.addColumn(1, textFieldWidth, textFieldHeight);
-            Button generation = new Button("Generation");
+            Button generation = new Button("Go!");
 
             pane.add(generation, 1, 2);
             pane.add(txWarnning, 0, 2);
@@ -81,26 +81,31 @@ public class load extends Application {
                 if (pattern.matcher(widthStr).matches() && pattern.matcher(heightStr).matches()) {
                     width = Integer.parseInt(widthStr);
                     height = Integer.parseInt(heightStr);
-                    width = width + width % 2 + 1;
-                    height = height + height % 2 + 1;
-                    map = new int[width][height];
-                    for (int i = 0; i < width; i++) {
-                        for (int j = 0; j < height; j++) {
-                            map[i][j] = Maze.BLANK;
-                            if (i == 0 || j == 0 || i == width - 1 || j == height - 1)
-                                map[i][j] = Maze.WALL;
+                    if (width * height > 100000) {
+                        txWarnning.setText("It's too large.");
+                        txWarnning.setFill(Color.RED);
+                    } else {
+                        width = width + width % 2 + 1;
+                        height = height + height % 2 + 1;
+                        map = new int[width][height];
+                        for (int i = 0; i < width; i++) {
+                            for (int j = 0; j < height; j++) {
+                                map[i][j] = Maze.BLANK;
+                                if (i == 0 || j == 0 || i == width - 1 || j == height - 1)
+                                    map[i][j] = Maze.WALL;
+                            }
                         }
+                        main.map = map;
+                        main.start(new Stage());
+                        loadStage.close();
                     }
-                    main.map = map;
-                    main.start(new Stage());
-                    loadStage.close();
                 } else {
-                    // TODO Not good enough
                     txWarnning.setText("Input is NOT allowed!");
                     txWarnning.setFill(Color.RED);
                 }
             });
             loadStage.setScene(new Scene(pane));
+            txWarnning.setText("Only allowed numbers");
         });
         loadPane.getChildren().addAll(btFile, btGeneration, txWarnning);
 

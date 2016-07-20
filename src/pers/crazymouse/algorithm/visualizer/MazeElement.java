@@ -11,6 +11,9 @@ import pers.crazymouse.algorithm.std.Maze;
 public class MazeElement extends ResizablePolygon {
     private double[] squarePoints = new double[]{0.0, 0.0, 10.0, 0.0, 10.0, 10.0, 0.0, 10.0};
     private double[] trianglePoints = new double[]{0.0, 0.0, Math.sqrt(3), 1.0, 0.0, 2.0};
+    private double[] arrowPoints = new double[]{0.0, 0.0, 10.0, 5.0, 0.0, 10.0, 3.0, 5.0};
+    private double[] beginPoints = new double[]{0.0, 0.0, 10.0, 0.0, 10.0, 10.0, 0.0, 10.0};
+    private double[] endPoints = new double[]{0.0, 0.0, 10.0, 0.0, 10.0, 10.0, 0.0, 10.0};
 
     private int x;
     private int y;
@@ -37,14 +40,30 @@ public class MazeElement extends ResizablePolygon {
     private void convert(int index) {
         if (index == lastType)
             return;
-        if ((lastType >= 0 && index < 0) || (lastType < 0 && index >= 0) || lastType == Integer.MIN_VALUE) {
+        if ((lastType >= 0 && index < 0) || (lastType < 0 && index >= 0) ||
+                (lastType < 0 && index < 0 && lastType != index) ||
+                lastType == Integer.MIN_VALUE) {
             getPoints().clear();
             if (index >= 0) {
                 for (double i : squarePoints)
                     getPoints().add(i);
             } else {
-                for (double i : trianglePoints)
-                    getPoints().add(i);
+                if (index == -1) {
+                    for (double i : arrowPoints)
+                        getPoints().add(i);
+                }
+                if (index == -2) {
+                    for (double i : beginPoints)
+                        getPoints().add(i);
+                    setRotate(0);
+                    setFill(MazePane.BEGIN);
+                }
+                if (index == -3) {
+                    for (double i : endPoints)
+                        getPoints().add(i);
+                    setRotate(0);
+                    setFill(MazePane.END);
+                }
             }
             resize();
         }

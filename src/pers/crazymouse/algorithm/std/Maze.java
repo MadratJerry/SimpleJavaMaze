@@ -32,13 +32,12 @@ public class Maze {
 
         }
     };
+    private Stack<Integer> bestTurnList = new Stack<>();
 
     private int bestPathLength = Integer.MAX_VALUE;
     private ObservableList<Stack<Integer>> pathList = new TrackableObservableList<Stack<Integer>>() {
         @Override
         protected void onChanged(ListChangeListener.Change<Stack<Integer>> c) {
-            if (turnList.size() < bestPathLength)
-                bestPathLength = turnList.size();
         }
     };
 
@@ -46,7 +45,7 @@ public class Maze {
      * Initialize the size of main.
      * Initialize the begin and end Mouse for (0, 0)
      *
-     * @param map
+     * @param map 01 map array
      */
     public Maze(int[][] map) {
         setMap(map);
@@ -79,10 +78,6 @@ public class Maze {
 
     public void searchPath() {
         searchPath(begin, end);
-    }
-
-    public int getBestPathLength() {
-        return bestPathLength;
     }
 
     public int getValue(int x, int y) {
@@ -120,15 +115,19 @@ public class Maze {
 
     public void setEnd(int x, int y) {
         this.end = new Mouse(x, y);
+        init();
     }
 
     private void init() {
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
-                if (map[i][j].getValue() == OCC)
+                if (map[i][j].getValue() != WALL)
                     map[i][j].setValue(BLANK);
             }
         }
+        bestPathLength = Integer.MAX_VALUE;
+        pathList.clear();
+        turnList.clear();
         stack.clear();
         stack.add(begin);
     }
@@ -158,6 +157,12 @@ public class Maze {
                 Stack<Integer> turnStack = new Stack<>();
                 for (int i : turnList)
                     turnStack.add(i);
+                if (turnStack.size() < bestPathLength) {
+                    bestPathLength = turnStack.size();
+                    synchronized (bestTurnList) {
+                        bestTurnList = (Stack<Integer>) turnStack.clone();
+                    }
+                }
                 pathList.add((Stack<Integer>) turnStack.clone());
             }
             if (!p.hasChoice()) {
@@ -174,6 +179,14 @@ public class Maze {
             }
         }
         return !stack.empty();
+    }
+
+    public Stack<Integer> getBestTurnList() {
+        return bestTurnList;
+    }
+
+    public int getBestPathLength() {
+        return bestPathLength;
     }
 
     public void clearMapWithValue(int value) {
@@ -198,6 +211,7 @@ public class Maze {
                 map[p.x][p.y].set(BLANK);
                 stack.pop();
             } else {
+
                 Mouse np = p.Turn(2);
                 if (getValue(np) != VISIT && getValue(np) != BLANK && isVaild(np)) {
                     int t = 6;
@@ -208,6 +222,7 @@ public class Maze {
                     map[x][y].setValue(BLANK);
                     stack.add(np);
                 }
+
             }
         }
         return !stack.empty();
@@ -294,7 +309,6 @@ public class Maze {
                 int t = turn.get(index);
                 e.x = x + ((t - 1) % 2) * d;
                 e.y = y + ((t - 2) % 2) * d;
-                turnList.add((t + 2) % 4);
                 lastTurn = (t + 2) % 4;
                 turn.remove(index);
                 e.turn.remove((t + 2) % 4);
