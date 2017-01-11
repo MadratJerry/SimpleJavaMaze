@@ -1,2 +1,2 @@
-# algorithm-collection-visualization
-Algorithm collection and visualization with Java code.
+# SimpleJavaMaze
+Just a simple Java maze with UI.
